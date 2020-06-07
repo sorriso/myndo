@@ -17,25 +17,27 @@ This solution is based on opens source and/of aws free-tier solution:
 
 
 # summary
-- vm provider    operating system    cluster solution      network type    available   create vm   install vm   create cluster
-- virtualbox     centos 7            swarm                 default         nok         ok          ok           nok
--                                    kubernetes (k8)       calico          nok         ok          ok           nok
--                                                          flannel         nok         ok          ok           nok
-- aws            centos 7 ami        swarm                 default         ok          ok          ok           ok
--                                    kubernetes (k8)       calico          nok         ok          ok           nok
--                                                          flannel         nok         ok          ok           nok
-- aws            amazon linux 2 ami  swarm                 default         nok         nok         nok          nok
--                                    kubernetes (k8)       calico          nok         nok         nok          nok
--                                                          flannel         nok         nok         nok          nok
+| vm provider   | operating system   | cluster solution     | network type   | available  | create vm  | install vm  | create cluster |
+| ------------- | ------------------ | -------------------- | -------------- | ---------- | ---------- | ----------- | -------------- |
+| virtualbox    | centos 7           | swarm                | default        | nok        | ok         | ok          | nok            |
+| virtualbox    | centos 7           | kubernetes (k8)      | calico         | nok        | ok         | ok          | nok            |
+| virtualbox    | centos 7           | kubernetes (k8)      | flannel        | nok        | ok         | ok          | nok            |
+| aws           | centos 7 ami       | swarm                | default        | ok         | ok         | ok          | ok             |
+| aws           | centos 7 ami       | kubernetes (k8)      | calico         | nok        | ok         | ok          | nok            |
+| aws           | centos 7 ami       | kubernetes (k8)      | flannel        | nok        | ok         | ok          | nok            |
+| aws           | amazon linux 2 ami | swarm                | default        | nok        | nok        | nok         | nok            |
+| aws           | amazon linux 2 ami | kubernetes (k8)      | calico         | nok        | nok        | nok         | nok            |
+| aws           | amazon linux 2 ami | kubernetes (k8)      | flannel        | nok        | nok        | nok         | nok            |
 
 
 # Operating system used on vm
-- for virtualbox  centos 7 (tested with CentOS-7-x86_64-Minimal-2003.iso) user: ansible pwd: centos (if you change it, you will have to update scripts)
-- for aws         centos 7 ami   (free tier)
--                 amazon linux 2 (free tier)
+- | virtualbox  | centos 7 (tested with CentOS-7-x86_64-Minimal-2003.iso) | user: ansible  | pwd: centos (if you change it, you will have to update scripts) |
+- | aws         | centos 7 ami   (free tier)                              | user: ansible  | pwd: N/A ssh key used |
+-               | amazon linux 2 (free tier)                              | user: ec2-user | pwd: N/A ssh key used |
 
 
-# Micro services (i.e container) are sharing data (i.e configuration & data files) within the cluster thanks to glusterfs solution
+# Micro services file system
+Micro services (i.e container) are sharing data (i.e configuration & data files) within the cluster thanks to glusterfs solution
 the minimum size of the cluster is 1 master and 2 workers (default configuration)
 
 
@@ -64,15 +66,19 @@ the minimum size of the cluster is 1 master and 2 workers (default configuration
         - shutdown the vm,
         - replace the "centos 7 installation iso" by the "VBoxGuestAdditions_x.y.z.iso" to its cdrom drive
         - restart the vm
-    - once restarted, connect as root, and enable ip / networking capability:
-      - vi /etc/sysconfig/network-scripts/ifcfg-eth0
+    - once restarted, login as root, and enable ip / networking capability:
+      - vi /etc/sysconfig/network-scripts/ifcfg-enp0s3
       - > set "onboot" to "yes"
       - > restart the vm
-    - re-connect as root, and install prerequisites for VBoxGuestAdditions by running:
-        - rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-        - yum upgrade -y
-        - yum install -y perl gcc dkms kernel-devel kernel-headers make bzip2 cloud-init
-        - reboot
+    - login as root and get vm ip
+      - ip addr show
+    - connection via ssh/terminal and install prerequisites for VBoxGuestAdditions by running:
+        - ssh root@<ip found>
+        - once logged:
+          - rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+          - yum upgrade -y
+          - yum install -y perl gcc dkms kernel-devel kernel-headers make bzip2 cloud-init
+          - reboot
     - re-connect as root, and install VBoxGuestAdditions by running:
         - ls -l /usr/src/kernels/$(uname -r)
         - > should be not empty
