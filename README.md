@@ -1,19 +1,22 @@
+# Purpose
 A tool (for unix environment) aiming to:
-- automate cluster installation hosting micro service (i.e. containers)
-- explore cluster configuration & use.
-- provide "sandboxing" capability to allow focusing on micro service / business usage -> do NOT used it "as is" for production (i.e harden / secure it before)
+* automate cluster installation hosting micro service (i.e. containers)
+* explore cluster configuration & use.
+* provide "sandboxing" capability to allow focusing on micro service / business usage -> do NOT used it "as is" for production (i.e harden / secure it before)
 
 
-this solution is based on opens source and/of aws free-tier solution:
- - ansible for automation installation
- - virtualbox for local vm hosting
- - docker for micro services (i.e. container) virtualization
- - swarm (from docker) for a simple & quick clustering solution
- - kubernetes (k8) for more a complete clustering solution
- - centos 7 (as centos 8 is not available as free-tier ami yet)
- - aws free-tier for cloud vm hosting (centos 7 & amazon linux 2)
+# Technology
+This solution is based on opens source and/of aws free-tier solution:
+ * ansible for automation installation
+ * virtualbox for local vm hosting
+ * docker for micro services (i.e. container) virtualization
+ * swarm (from docker) for a simple & quick clustering solution
+ * kubernetes (k8) for more a complete clustering solution
+ * centos 7 (as centos 8 is not available as free-tier ami yet)
+ * aws free-tier for cloud vm hosting (centos 7 & amazon linux 2)
 
 
+# summary
 - vm provider    operating system    cluster solution      network type    available   create vm   install vm   create cluster
 - virtualbox     centos 7            swarm                 default         nok         ok          ok           nok
 -                                    kubernetes (k8)       calico          nok         ok          ok           nok
@@ -26,31 +29,31 @@ this solution is based on opens source and/of aws free-tier solution:
 -                                                          flannel         nok         nok         nok          nok
 
 
-operating system used on vm
+# Operating system used on vm
 - for virtualbox  centos 7 (tested with CentOS-7-x86_64-Minimal-2003.iso) user: ansible pwd: centos (if you change it, you will have to update scripts)
 - for aws         centos 7 ami   (free tier)
 -                 amazon linux 2 (free tier)
 
 
-micro services (i.e container) are sharing data (i.e configuration & data files) within the cluster thanks to glusterfs solution
+# Micro services (i.e container) are sharing data (i.e configuration & data files) within the cluster thanks to glusterfs solution
 the minimum size of the cluster is 1 master and 2 workers (default configuration)
 
 
-Prerequisites on local host
+# Prerequisites on local host
 - docker installed & running (tested with v19.03.8)
 - virtualbox installed (tested with 6.1.8 r137981 (Qt5.6.3))
 - ansible installed (tested with v2.9.9)
 - an aws account (tested on an account having root privilege)
 
 
-configuration of vm
+# Configuration of vm
 - all configuration files are stored in <myndo_root>/ansible_scripts/vars
 - during vm's installation:
   - the latest version are used, except for docker, docker-compose, glusterfs and k8 (version fixed in configuration files)
   - regarding amazon ami, the latest version that is available in the "aws region" is used
 
 
-preparation for virtualbox use:
+# Preparation for virtualbox use:
   - vm iso template preparaiotn
     - download centos 7 installation iso
     - download VBoxGuestAdditions_x.y.z.iso from virtualbox web site
@@ -88,26 +91,26 @@ preparation for virtualbox use:
     - ssh-keygen -t rsa -b 4096 -f ./id_rsa
 
 
-preparation for aws use:
-  prerequisite for ansible ssh connection
+# Preparation for aws use:
+* prerequisite for ansible ssh connection
   - go to your aws console management
   - generate an ssh key & name it as "sandbox_key.pem"
   - download it
   - move it in <myndo_root>/ansible_scripts/vars/sandbox_key.pem
-  create an ansible vault to store aws credentials:
-    cd <myndo_root>/ansible_scripts/vars
-    openssl genrsa -out ./vault.aws_sandbox.pass 2048
-    ansible-vault create ./credentials.aws_sandbox.vault.yml --vault-password-file ./vault.aws_sandbox.pass
-    ansible-vault edit ./credentials.aws_sandbox.vault.yml --vault-password-file ./vault.aws_sandbox.pass
-    -> add our credential (from aws management console)
-    aws_access_key: XXXXXXXXXXXXX
-    aws_secret_key: YYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+# create an ansible vault to store aws credentials:
+  - cd <myndo_root>/ansible_scripts/vars
+  - openssl genrsa -out ./vault.aws_sandbox.pass 2048
+  - ansible-vault create ./credentials.aws_sandbox.vault.yml --vault-password-file ./vault.aws_sandbox.pass
+  - ansible-vault edit ./credentials.aws_sandbox.vault.yml --vault-password-file ./vault.aws_sandbox.pass
+  - > add our credential (from aws management console)
+  - aws_access_key: XXXXXXXXXXXXX
+  - aws_secret_key: YYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
 
-accessing to vm via ssh
-- virtualbox
+# Accessing to vm via ssh
+* virtualbox
     CentOS
       ssh ansible@<ip from ansible inventory file> -i  ~/.ssh/id_rsa
--aws
+* aws
   get <vm dns name> from aws administration console / ec2
   ssh centos@192.168.0.27 -i /Users/olivier/.ssh/id_rsa
   CentOS
@@ -115,8 +118,8 @@ accessing to vm via ssh
   amazon linux 2:
     ssh ec2-user@<vm dns name> -i  <myndo_root>/ansible_scripts/vars/sandbox_key.pem
 
-using micro services through the created cluster
-  swarm
+# Using micro services through the created cluster
+* swarm
     - get swarm node status
       login via ssh to a swarm master node
       execute: sudo docker node ls
