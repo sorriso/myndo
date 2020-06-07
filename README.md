@@ -3,6 +3,7 @@ A tool (for unix environment) aiming to:
 - explore cluster configuration & use.
 - provide "sandboxing" capability to allow focusing on micro service / business usage -> do NOT used it "as is" for production (i.e harden / secure it before)
 
+
 this solution is based on opens source and/of aws free-tier solution:
  - ansible for automation installation
  - virtualbox for local vm hosting
@@ -11,6 +12,7 @@ this solution is based on opens source and/of aws free-tier solution:
  - kubernetes (k8) for more a complete clustering solution
  - centos 7 (as centos 8 is not available as free-tier ami yet)
  - aws free-tier for cloud vm hosting (centos 7 & amazon linux 2)
+
 
 - vm provider    operating system    cluster solution      network type    available   create vm   install vm   create cluster
 - virtualbox     centos 7            swarm                 default         nok         ok          ok           nok
@@ -23,13 +25,16 @@ this solution is based on opens source and/of aws free-tier solution:
 -                                    kubernetes (k8)       calico          nok         nok         nok          nok
 -                                                          flannel         nok         nok         nok          nok
 
+
 operating system used on vm
 - for virtualbox  centos 7 (tested with CentOS-7-x86_64-Minimal-2003.iso) user: ansible pwd: centos (if you change it, you will have to update scripts)
 - for aws         centos 7 ami   (free tier)
 -                 amazon linux 2 (free tier)
 
+
 micro services (i.e container) are sharing data (i.e configuration & data files) within the cluster thanks to glusterfs solution
 the minimum size of the cluster is 1 master and 2 workers (default configuration)
+
 
 Prerequisites on local host
 - docker installed & running (tested with v19.03.8)
@@ -37,14 +42,16 @@ Prerequisites on local host
 - ansible installed (tested with v2.9.9)
 - an aws account (tested on an account having root privilege)
 
+
 configuration of vm
 - all configuration files are stored in <myndo_root>/ansible_scripts/vars
 - during vm's installation:
   - the latest version are used, except for docker, docker-compose, glusterfs and k8 (version fixed in configuration files)
   - regarding amazon ami, the latest version that is available in the "aws region" is used
 
+
 preparation for virtualbox use:
-  vm iso template preparaiotn
+  - vm iso template preparaiotn
     - download centos 7 installation iso
     - download VBoxGuestAdditions_x.y.z.iso from virtualbox web site
     - create a new brand vm & link the "centos 7 installation iso" to its cdrom drive
@@ -55,30 +62,31 @@ preparation for virtualbox use:
         - replace the "centos 7 installation iso" by the "VBoxGuestAdditions_x.y.z.iso" to its cdrom drive
         - restart the vm
     - once restarted, connect as root, and enable ip / networking capability:
-      vi /etc/sysconfig/network-scripts/ifcfg-eth0
-      -> set "onboot" to "yes"
-      -> restart the vm
+      - vi /etc/sysconfig/network-scripts/ifcfg-eth0
+      - > set "onboot" to "yes"
+      - > restart the vm
     - re-connect as root, and install prerequisites for VBoxGuestAdditions by running:
-        rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-        yum upgrade -y
-        yum install -y perl gcc dkms kernel-devel kernel-headers make bzip2 cloud-init
-        reboot
+        - rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+        - yum upgrade -y
+        - yum install -y perl gcc dkms kernel-devel kernel-headers make bzip2 cloud-init
+        - reboot
     - re-connect as root, and install VBoxGuestAdditions by running:
-        ls -l /usr/src/kernels/$(uname -r)
-        -> should be not empty
-        mount /dev/cdrom /mnt
-        cd /mnt
-        ./VBoxLinuxAdditions.run
-        reboot
+        - ls -l /usr/src/kernels/$(uname -r)
+        - > should be not empty
+        - mount /dev/cdrom /mnt
+        - cd /mnt
+        - ./VBoxLinuxAdditions.run
+        - reboot
     - shutdown it vm
     - export it as "CentOS_7_Minimal_baseline.ova"
     - copy or move it to <myndo_root>/ansible_scripts/vars
-  prerequisite for ansible ssh connection
-    ensure the files "id_rsa" and "id_rsa.pub" exist in "~/.ssh" folder
-    if not, create them:
-    mkdir -p ~/.ssh
-    cd ~/.ssh
-    ssh-keygen -t rsa -b 4096 -f ./id_rsa
+  - prerequisite for ansible ssh connection
+    - ensure the files "id_rsa" and "id_rsa.pub" exist in "~/.ssh" folder
+    - if not, create them:
+    - mkdir -p ~/.ssh
+    - cd ~/.ssh
+    - ssh-keygen -t rsa -b 4096 -f ./id_rsa
+
 
 preparation for aws use:
   prerequisite for ansible ssh connection
