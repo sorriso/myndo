@@ -31,9 +31,11 @@ This solution is based on opens source and/of aws free-tier solution:
 
 
 # Operating system used on vm
-| virtualbox  | centos 7 (tested with CentOS-7-x86_64-Minimal-2003.iso) | user: ansible  | pwd: centos (if you change it, you will have to update scripts) |
-| aws         | centos 7 ami   (free tier)                              | user: ansible  | pwd: N/A ssh key used |
-| aws         | amazon linux 2 (free tier)                              | user: ec2-user | pwd: N/A ssh key used |
+| vm provider | operating system                                        | user           | pwd             |
+| ----------- | ------------------------------------------------------- | -------------- | --------------- |
+| virtualbox  | centos 7 (tested with CentOS-7-x86_64-Minimal-2003.iso) | ansible  | centos (if you change it, you will have to update scripts) |
+| aws         | centos 7 ami   (free tier)                              | ansible  | N/A ssh key used |
+| aws         | amazon linux 2 (free tier)                              | ec2-user | N/A ssh key used |
 
 
 # Micro services file system
