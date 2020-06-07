@@ -31,9 +31,9 @@ This solution is based on opens source and/of aws free-tier solution:
 
 
 # Operating system used on vm
-- | virtualbox  | centos 7 (tested with CentOS-7-x86_64-Minimal-2003.iso) | user: ansible  | pwd: centos (if you change it, you will have to update scripts) |
-- | aws         | centos 7 ami   (free tier)                              | user: ansible  | pwd: N/A ssh key used |
--               | amazon linux 2 (free tier)                              | user: ec2-user | pwd: N/A ssh key used |
+| virtualbox  | centos 7 (tested with CentOS-7-x86_64-Minimal-2003.iso) | user: ansible  | pwd: centos (if you change it, you will have to update scripts) |
+| aws         | centos 7 ami   (free tier)                              | user: ansible  | pwd: N/A ssh key used |
+| aws         | amazon linux 2 (free tier)                              | user: ec2-user | pwd: N/A ssh key used |
 
 
 # Micro services file system
@@ -52,7 +52,7 @@ the minimum size of the cluster is 1 master and 2 workers (default configuration
 - all configuration files are stored in <myndo_root>/ansible_scripts/vars
 - during vm's installation:
   - the latest version are used, except for docker, docker-compose, glusterfs and k8 (version fixed in configuration files)
-  - regarding amazon ami, the latest version that is available in the "aws region" is used
+  - regarding amazon ami, the latest version that is available in the "aws region" is used at vm creation.
 
 
 # Preparation for virtualbox use:
@@ -68,8 +68,8 @@ the minimum size of the cluster is 1 master and 2 workers (default configuration
         - restart the vm
     - once restarted, login as root, and enable ip / networking capability:
       - vi /etc/sysconfig/network-scripts/ifcfg-enp0s3
-      - > set "onboot" to "yes"
-      - > restart the vm
+      - set "onboot" to "yes"
+      - restart the vm
     - login as root and get vm ip
       - ip addr show
     - connection via ssh/terminal and install prerequisites for VBoxGuestAdditions by running:
@@ -81,7 +81,7 @@ the minimum size of the cluster is 1 master and 2 workers (default configuration
           - reboot
     - re-connect as root, and install VBoxGuestAdditions by running:
         - ls -l /usr/src/kernels/$(uname -r)
-        - > should be not empty
+        - should be not empty
         - mount /dev/cdrom /mnt
         - cd /mnt
         - ./VBoxLinuxAdditions.run
@@ -108,7 +108,7 @@ the minimum size of the cluster is 1 master and 2 workers (default configuration
   - openssl genrsa -out ./vault.aws_sandbox.pass 2048
   - ansible-vault create ./credentials.aws_sandbox.vault.yml --vault-password-file ./vault.aws_sandbox.pass
   - ansible-vault edit ./credentials.aws_sandbox.vault.yml --vault-password-file ./vault.aws_sandbox.pass
-  - > add our credential (from aws management console)
+  - add our credential (from aws management console)
   - aws_access_key: XXXXXXXXXXXXX
   - aws_secret_key: YYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
 
@@ -126,9 +126,9 @@ the minimum size of the cluster is 1 master and 2 workers (default configuration
 
 # Using micro services through the created cluster
 * swarm
-    - get swarm node status
-      login via ssh to a swarm master node
-      execute: sudo docker node ls
-    - get swarm running service list
-      login via ssh to a swarm master node
-      execute: sudo docker node ps
+  - get swarm node status
+    login via ssh to a swarm master node
+    execute: sudo docker node ls
+  - get swarm running service list
+    login via ssh to a swarm master node
+    execute: sudo docker node ps
