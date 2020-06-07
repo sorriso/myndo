@@ -12,7 +12,7 @@ this solution is based on opens source and/of aws free-tier solution:
  - centos 7 (as centos 8 is not available as free-tier ami yet)
  - aws free-tier for cloud vm hosting (centos 7 & amazon linux 2)
 
-vm provider  - operating system -  cluster solution   -  network type  - available - create vm - install vm - create cluster
+- vm provider    operating system    cluster solution      network type    available   create vm   install vm   create cluster
 - virtualbox     centos 7            swarm                 default         nok         ok          ok           nok
 -                                    kubernetes (k8)       calico          nok         ok          ok           nok
 -                                                          flannel         nok         ok          ok           nok
@@ -24,9 +24,9 @@ vm provider  - operating system -  cluster solution   -  network type  - availab
 -                                                          flannel         nok         nok         nok          nok
 
 operating system used on vm
-- for virtualbox: centos 7 (tested with CentOS-7-x86_64-Minimal-2003.iso) user: ansible pwd: centos (if you change it, you will have to update scripts)
-- for aws       : centos 7 ami   (free tier)
--               : amazon linux 2 (free tier)
+- for virtualbox  centos 7 (tested with CentOS-7-x86_64-Minimal-2003.iso) user: ansible pwd: centos (if you change it, you will have to update scripts)
+- for aws         centos 7 ami   (free tier)
+-                 amazon linux 2 (free tier)
 
 micro services (i.e container) are sharing data (i.e configuration & data files) within the cluster thanks to glusterfs solution
 the minimum size of the cluster is 1 master and 2 workers (default configuration)
