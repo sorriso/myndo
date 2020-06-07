@@ -1,0 +1,43 @@
+---
+- name: Clean files
+  ignore_errors: yes
+  command: "rm {{ playbook_dir }}/vars/virtualbox_vmlist.txt"
+  tags: [virtualbox]
+
+- name: Create vm list files
+  command: "touch {{ playbook_dir }}/vars/virtualbox_vmlist.txt"
+  tags: [virtualbox]
+
+- name: Fill in vm list files
+  lineinfile:
+    dest: "{{ playbook_dir }}/vars/virtualbox_vmlist.txt"
+    line: "{{ item }}"
+  with_lines: VBoxManage list vms
+  tags: [virtualbox]
+
+- name: Remove quote in vm list files
+  replace:
+    path: "{{ playbook_dir }}/vars/virtualbox_vmlist.txt"
+    regexp: '\"'
+    replace: ''
+  tags: [virtualbox]
+
+- name: Loop vm list files
+  include_role:
+    name: virtualbox_delete_vm
+  vars:
+    myvmtoken: "{{ item.split(' ')[0] }}"
+    prefix: "{{ cluster_vm_name_prefix }}"
+  with_lines: cat {{ playbook_dir }}/vars/virtualbox_vmlist.txt
+  when: "prefix in myvmtoken"
+  tags: [virtualbox]
+
+- name: Clean files
+  ignore_errors: yes
+  command: "rm {{ playbook_dir }}/vars/virtualbox_vmlist.txt"
+  tags: [virtualbox]
+
+- name: Clean tmp folder
+  ignore_errors: yes
+  command:  rm -rf "{{ playbook_dir }}/tmp"
+  tags: [virtualbox]

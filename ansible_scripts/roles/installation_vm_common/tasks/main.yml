@@ -1,0 +1,86 @@
+---
+- name: Clean local repo
+  become: true
+  yum:
+    autoremove: yes
+  tags: [common]
+
+- name: Clean cache
+  become: true
+  yum:
+    update_cache: yes
+  tags: [common]
+
+- name: upgrade all packages (centos)
+  become: true
+  yum:
+    name: '*'
+    state: latest
+    exclude: docker*,containerd.io* #issue on latest version, nobest installation
+  tags: [centos]
+
+- name: upgrade all packages (amzn2)
+  become: true
+  yum:
+    name: '*'
+    state: latest
+  tags: [amzn2]
+
+- name: install required ansible packages
+  become: true
+  yum:
+    name: firewalld
+    state: present
+  tags: [common]
+
+- name: enable sysv firewalld service
+  become: true
+  service:
+      name: firewalld.service
+      enabled: yes
+  tags: [common]
+
+- name: Start firewalld service
+  become: true
+  service:
+      name: firewalld.service
+      state: started
+  tags: [common]
+
+- name: install required packages for installation = python3
+  become: true
+  yum:
+    name: 'python3'
+    state: present
+  tags: [common]
+
+- name: install required packages for ansible boto3 for python 3
+  become: true
+  shell: pip3 install boto3
+  tags: [common]
+
+- name: add epel-release packages
+  become: true
+  yum:
+    name: 'epel-release'
+    state: present
+  tags: [common]
+
+- name: install pip packages for pyhton 2.7
+  become: true
+  yum:
+    name: 'python-pip'
+    state: present
+  tags: [common]
+
+- name: install required packages for ansible boto3 for python 2
+  become: true
+  shell: pip install boto3
+  tags: [common]
+
+- name: install required packages for installation = dnf
+  become: true
+  yum:
+    name: 'dnf'
+    state: present
+  tags: [centos]

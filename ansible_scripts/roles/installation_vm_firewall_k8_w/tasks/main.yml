@@ -1,0 +1,33 @@
+---
+# K8 worker
+
+- name: Add firewall rules for K8
+  become: true
+  command: firewall-cmd --add-port=10251/tcp --permanent
+  tags: [k8]
+
+- name: Add firewall rules for K8
+  become: true
+  command: firewall-cmd --add-port=10255/tcp --permanent
+  tags: [k8]
+
+- name: Reload firewall
+  become: true
+  command: firewall-cmd --reload
+  tags: [k8]
+
+- name: Configure firewall routing rules
+  become: true
+  copy:
+    content: |
+              net.bridge.bridge-nf-call-ip6tables = 1
+              net.bridge.bridge-nf-call-iptables = 1
+    dest: /etc/sysctl.d/k8s.conf
+  tags: [common]
+
+  tags: [k8]
+
+- name: Reload firewall general settings
+  become: true
+  command: sysctl --system
+  tags: [k8]

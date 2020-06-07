@@ -1,0 +1,24 @@
+---
+
+- name: Get instances facts
+  ec2_instance_info:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    region: "{{ aws_region }}"
+    filters:
+      "tag:Environment": "{{ vm_env }}"
+  register: result
+  tags: [aws]
+
+- name: Delete EC2 instance
+  vars:
+    item_state_code: "{{ item.state.code }}"
+  ec2_instance:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    region: "{{ aws_region }}"
+    instance_ids: "{{ item.instance_id }}"
+    state: "absent"
+  with_items: "{{ result.instances }}"
+  when: item_state_code != 16
+  tags: [aws]

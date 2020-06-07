@@ -1,0 +1,21 @@
+---
+# swarm master
+- name: Copy the master join command to remote host
+  copy:
+    src: "{{ playbook_dir }}/vars/swarm-m-join-command"
+    dest: "/tmp/"
+    mode: 0777
+  tags: [swarm]
+
+- name: Join the node to swarm cluster as master
+  become: true
+  ignore_errors: true
+  command: sh /tmp/swarm-m-join-command
+  tags: [swarm]
+
+- name: Remove master token file from tmp folder
+  become: true
+  file:
+    path: /tmp/swarm-m-join-command
+    state: absent
+  tags: [swarm]

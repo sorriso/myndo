@@ -1,0 +1,15 @@
+---
+- name: Initialize the Kubernetes cluster using flannel virtual network add-on
+  become: true
+  command: kubectl apply --filename https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+  tags: [k8,flannel]
+
+- name: Install calico
+  become: true
+  command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+  tags: [k8,calico]
+
+- name: Install calico pod network
+  become: false
+  command: k8 create -f https://docs.projectcalico.org/v3.4/getting-started/kubernetes/installation/hosted/calico.yaml
+  tags: [k8,calico]

@@ -1,0 +1,52 @@
+---
+# glusterfs
+
+# https://access.redhat.com/documentation/en-us/red_hat_gluster_storage/3.1/html/administration_guide/chap-getting_started
+
+# Table 4.1. TCP Port Numbers
+
+# 111	  = For rpc port mapper.
+# 139	  = For netbios service.
+# 445	  = For CIFS protocol
+# 965	  = For NFS's Lock Manager (NLM).
+# 2049  =	For glusterFS's NFS exports (nfsd process).
+# 24007	= For glusterd (for management).
+# 24009 - 24108	= For client communication with Red Hat Gluster Storage 2.0.
+# 38465	= For NFS mount protocol.
+# 38466	= For NFS mount protocol.
+# 38468	= For NFS's Lock Manager (NLM).
+# 38469	= For NFS's ACL support.
+# 39543	= For oVirt (Red Hat Gluster Storage Console).
+# 49152 - 49251	= For client communication with Red Hat Gluster Storage 2.1 and for brick processes depending on the availability of the ports. The total number of ports required to be open depends on the total number of bricks exported on the machine.
+# 54321	= For VDSM (Red Hat Gluster Storage Console).
+# 55863	= For oVirt (Red Hat Gluster Storage Console).
+
+- name: Add firewall rules for glusterfs = Gluster Daemon
+  become: true
+  command: firewall-cmd --add-port=24007/tcp --permanent
+  tags: [common]
+
+- name: Add firewall rules for glusterfs = Each brick for every volume on your host requires it’s own port
+  become: true
+  command: firewall-cmd --add-port=49152-49156/tcp --permanent
+  tags: [common]
+
+- name: Add firewall rules for glusterfs = For rpc port mapper
+  become: true
+  command: firewall-cmd --add-port=111/tcp --permanent
+  tags: [common]
+
+- name: Add firewall rules for glusterfs = port mapper udp
+  become: true
+  command: firewall-cmd --add-port=111/udp --permanent
+  tags: [common]
+
+- name: Add firewall rules for glusterfs = port mapper udp
+  become: true
+  command: firewall-cmd --add-port=2049/tcp --permanent
+  tags: [common]
+
+- name: Reload firewall
+  become: true
+  command: firewall-cmd --reload
+  tags: [common]

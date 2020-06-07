@@ -1,0 +1,90 @@
+---
+- name: Pull K8 docker images
+  ignore_errors: yes
+  become: yes
+  command: kubeadm config images pull
+  tags: [k8]
+
+- name: Initialize the Kubernetes cluster using kubeadm
+  ignore_errors: yes
+  become: yes
+  command: kubeadm init --kubernetes-version=v1.18.3 --pod-network-cidr 10.244.0.0/16 --apiserver-advertise-address={{ hostvars[inventory_hostname]['ansible_host'] }}
+  tags: [k8,virtualbox]
+
+- name: Run the Kubernetes cluster as std user 1 on 2
+  become: yes
+  command: mkdir -p /home/ansible/.kube
+  tags: [k8]
+
+- name: Run the Kubernetes cluster as std user 2 on 2
+  become: true
+  copy:
+    remote_src: yes
+    src: /etc/kubernetes/admin.conf
+    dest: /home/ansible/.kube/config
+    owner: ansible
+    group: sudo
+    force: yes
+  tags: [k8]
+
+- name: Update .bashrc with KUBECONFIG
+  become: true
+  lineinfile:
+    dest: "/home/ansible/.bashrc"
+    insertafter: "EOF"
+    line: "export KUBECONFIG=/home/ansible/.kube/admin.conf"
+  with_items: "{{ foo }}"
+  tags: [k8]
+
+- name: export KUBECONFIG in shell
+  become: true
+  command: "export KUBECONFIG=/home/ansible/.kube/admin.conf"
+  tags: [k8]
+
+- name: Store k8 config into localhost var directory
+  become: true
+  fetch:
+    src: /etc/kubernetes/admin.conf
+    dest: "{{ playbook_dir }}/vars/admin.conf"
+    flat: yes
+  tags: [k8]
+
+# to see cluster's processes
+# sudo  watch -n0 kubectl --kubeconfig /etc/kubernetes/admin.conf --namespace kube-system get pods --output wide
+# sudo kubectl --kubeconfig /home/ansible/.kube/config get nodes
+# sudo kubectl --kubeconfig /home/ansible/.kube/config get pods --all-namespaces -o wide
+
+- name: Remove old join command to local file
+  become: true
+  file:
+    path: "{{ playbook_dir }}/vars/join-command"
+    state: absent
+  tags: [k8]
+
+- name: Generate join command
+  become: true
+  command: kubeadm token create --print-join-command
+  register: join_command
+  tags: [k8]
+
+- name: Create token file
+  copy:
+    content: "{{ join_command.stdout_lines[0] }}"
+    dest: /tmp/k8-join-command
+    force: yes
+  tags: [k8]
+
+- name: Store k8 token file into localhost var directory
+  become: true
+  fetch:
+    src: /tmp/k8-join-command
+    dest: "{{ playbook_dir }}/vars/k8-join-command"
+    flat: yes
+  tags: [k8]
+
+- name: Remove token file from tmp folder
+  become: true
+  file:
+    path: /tmp/k8-join-command
+    state: absent
+  tags: [k8]

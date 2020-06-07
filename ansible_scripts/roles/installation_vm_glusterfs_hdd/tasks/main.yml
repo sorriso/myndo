@@ -1,0 +1,120 @@
+---
+# get disk available
+# lsblk
+
+- name: Link Glusterfs node partition (centos virtualbox)
+  become: true
+  command: parted /dev/sdb mklabel msdos
+  tags: [virtualbox,centos]
+
+- name: Create Glusterfs node partition (centos virtualbox)
+  become: true
+  command: parted -a opt /dev/sdb mkpart primary xfs 2048s 100%
+  tags: [virtualbox,centos]
+
+- name: Format Glusterfs node partition (centos virtualbox)
+  become: true
+  command: mkfs.xfs -f /dev/sdb -L gfsdisk
+  tags: [virtualbox,centos]
+
+
+
+- name: Link Glusterfs node partition (centos aws)
+  become: true
+  command: parted /dev/xvdf mklabel msdos
+  tags: [aws,centos]
+
+- name: Create Glusterfs node partition (centos aws)
+  become: true
+  command: parted -a opt /dev/xvdf mkpart primary xfs 2048s 100%
+  tags: [aws,centos]
+
+- name: Format Glusterfs node partition (centos aws)
+  become: true
+  command: mkfs.xfs -f /dev/xvdf -L gfsdisk
+  tags: [aws,centos]
+
+
+
+- name: Link Glusterfs node partition (amzn2)
+  become: true
+  command: parted /dev/xvdb mklabel msdos
+  tags: [aws,amzn2]
+
+- name: Create Glusterfs node partition (amzn2)
+  become: true
+  command: parted -a opt /dev/xvdb mkpart primary xfs 2048s 100%
+  tags: [aws,amzn2]
+
+- name: Format Glusterfs node partition (amzn2)
+  become: true
+  command: mkfs.xfs -f /dev/xvdb -L gfsdisk
+  tags: [aws,amzn2]
+
+
+
+- name: Create Glusterfs directory
+  become: true
+  command: mkdir -p /private/gfsbrick
+  tags: [common]
+
+
+
+- name: Mount Glusterfs node partition (centos virtualbox)
+  become: true
+  command: mount /dev/sdb /private/gfsbrick/
+  tags: [virtualbox,centos]
+
+- name: Make permanent Glusterfs directory mounting (centos virtualbox)
+  become: true
+  command: sudo /bin/su -c "echo '/dev/sdb /private/gfsbrick/ xfs defaults 1 2' >> /etc/fstab"
+  tags: [virtualbox,centos]
+
+- name: Get glusterfs volume status (centos virtualbox)
+  become: true
+  command: df -hTP /dev/sdb
+  register: gluster_status2
+  tags: [virtualbox,centos]
+
+
+
+- name: Mount Glusterfs node partition (centos aws)
+  become: true
+  command: mount /dev/xvdf /private/gfsbrick/
+  tags: [aws,centos]
+
+- name: Make permanent Glusterfs directory mounting (centos aws)
+  become: true
+  command: sudo /bin/su -c "echo '/dev/xvdf /private/gfsbrick/ xfs defaults 1 2' >> /etc/fstab"
+  tags: [aws,centos]
+
+- name: Get glusterfs volume status (centos aws)
+  become: true
+  command: df -hTP /dev/xvdf
+  register: gluster_status2
+  tags: [aws,centos]
+
+
+
+- name: Mount Glusterfs node partition (amzn2 aws)
+  become: true
+  command: mount /dev/xvdf /private/gfsbrick/
+  tags: [aws,amzn2]
+
+- name: Make permanent Glusterfs directory mounting (amzn2 aws)
+  become: true
+  command: sudo /bin/su -c "echo '/dev/xvdf /private/gfsbrick/ xfs defaults 1 2' >> /etc/fstab"
+  tags: [aws,amzn2]
+
+- name: Get glusterfs volume status (amzn2 aws)
+  become: true
+  command: df -hTP /dev/xvdb
+  register: gluster_status2
+  tags: [aws,amzn2]
+
+
+
+- name: Display glusterfs volume status
+  debug:
+    var: gluster_status2
+  tags: [common]

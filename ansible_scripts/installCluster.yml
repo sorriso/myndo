@@ -1,0 +1,214 @@
+---
+#
+# AWS instance installation
+#
+
+- name:  Install cluster 1 on 7 (aws)
+  hosts: cluster_managers[0]
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include aws env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+    - name: include vault for aws env
+      include_vars: "./vars/credentials.{{ vm_env }}.vault.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_firewall_swarm_m
+    - installation_vm_swarm_init
+  tags: [aws]
+
+- name:  Install cluster 2 on 7 (aws)
+  hosts: cluster_all
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include aws env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+    - name: include vault for aws env
+      include_vars: "./vars/credentials.{{ vm_env }}.vault.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_k8-1
+  tags: [aws]
+
+- name:  Install cluster 3 on 7 (aws)
+  hosts: cluster_workers
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include aws env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+    - name: include vault for aws env
+      include_vars: "./vars/credentials.{{ vm_env }}.vault.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_firewall_k8_w
+    - installation_vm_firewall_swarm_w
+    - installation_vm_swarm_w
+  tags: [aws]
+
+- name:  Install cluster 4 on 7 (aws)
+  hosts: cluster_managers
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include aws env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+    - name: include vault for aws env
+      include_vars: "./vars/credentials.{{ vm_env }}.vault.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_firewall_k8_m
+    - installation_vm_firewall_swarm_m
+    - installation_vm_swarm_m
+  tags: [aws]
+
+- name:  Install cluster 5 on 7 (aws)
+  hosts: cluster_managers[0]
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include aws env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+    - name: include vault for aws env
+      include_vars: "./vars/credentials.{{ vm_env }}.vault.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_k8-2
+  tags: [aws]
+
+- name:  Install cluster 6 on 7 (aws)
+  hosts: cluster_workers
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include aws env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+    - name: include vault for aws env
+      include_vars: "./vars/credentials.{{ vm_env }}.vault.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_k8-3
+  tags: [aws]
+
+- name:  Install cluster 7 on 7 (aws)
+  hosts: cluster_managers[0]
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include aws env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+    - name: include vault for aws env
+      include_vars: "./vars/credentials.{{ vm_env }}.vault.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_k8-4
+  tags: [aws]
+
+#
+# Virtualbox instance installation
+#
+
+- name:  Install cluster 1 on 7 (virtualbox / centos)
+  hosts: cluster_managers[0]
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_firewall_swarm_m
+    - installation_vm_swarm_init
+  tags: [virtualbox]
+
+- name:  Install cluster 2 on 7 (virtualbox / centos)
+  hosts: cluster_all
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_k8-1
+  tags: [virtualbox]
+
+- name:  Install cluster 3 on 7 (virtualbox / centos)
+  hosts: cluster_workers
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_firewall_k8_w
+    - installation_vm_firewall_swarm_w
+    - installation_vm_swarm_w
+  tags: [virtualbox]
+
+- name:  Install cluster 4 on 7 (virtualbox / centos)
+  hosts: cluster_managers
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_firewall_k8_m
+    - installation_vm_firewall_swarm_m
+    - installation_vm_swarm_m
+  tags: [virtualbox]
+
+- name:  Install cluster 5 on 7 (virtualbox / centos)
+  hosts: cluster_managers[0]
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_k8-2
+  tags: [virtualbox]
+
+- name:  Install cluster 6 on 7 (virtualbox / centos)
+  hosts: cluster_workers
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_k8-3
+  tags: [virtualbox]
+
+- name:  Install cluster 7 on 7 (virtualbox / centos)
+  hosts: cluster_managers[0]
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_k8-4
+  tags: [virtualbox]

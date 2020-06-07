@@ -1,0 +1,101 @@
+---
+#
+# Fill ansible inventory file for AWS VM provider
+#
+- name: sleep for 15 seconds to let vm to stop and continue with playbook
+  wait_for:
+    timeout: 15
+  tags: [common]
+
+- name: Get EC2 instances facts
+  ec2_instance_info:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    region: "{{ aws_region }}"
+    filters:
+      "tag:Environment": "{{ vm_env }}"
+      "instance-state-name": "running"
+  register: result
+  tags: [aws]
+
+- name: Display EC2 instance facts result
+  debug:
+    msg: "ID: {{ result }}"
+  tags: [aws]
+
+- name: Add EC2 vm IP CLUSTER in ansible hosts file
+  vars:
+    item_state_code: "{{ item.state.code }}"
+  lineinfile:
+    dest: "{{ playbook_dir }}/inventory/hosts"
+    insertafter: '# Hosts'
+    line: "{{ item.tags.Name }} ansible_host={{ item.public_dns_name }}"
+  with_items: "{{ result.instances }}"
+  tags: [aws,centos7]
+
+- name: Add EC2 vm IP for GLUSTER in ansible hosts file
+  vars:
+    item_state_code: "{{ item.state.code }}"
+  lineinfile:
+    dest: "{{ playbook_dir }}/inventory/hosts"
+    insertafter: '# Hosts'
+    line: "g-{{ item.tags.Name | regex_replace('_', '-') }} ansible_host={{ item.public_dns_name }}"
+  with_items: "{{ result.instances }}"
+  tags: [aws,centos7]
+
+- name: Add EC2 vm IP CLUSTER in ansible hosts file
+  vars:
+    item_state_code: "{{ item.state.code }}"
+  lineinfile:
+    dest: "{{ playbook_dir }}/inventory/hosts"
+    insertafter: '# Hosts'
+    line: "{{ item.tags.Name }} ansible_host={{ item.public_dns_name }}"
+  with_items: "{{ result.instances }}"
+  tags: [aws,amzn2]
+
+- name: Add EC2 vm IP for GLUSTER in ansible hosts file
+  vars:
+    item_state_code: "{{ item.state.code }}"
+  lineinfile:
+    dest: "{{ playbook_dir }}/inventory/hosts"
+    insertafter: '# Hosts'
+    line: "g-{{ item.tags.Name | regex_replace('_', '-') }} ansible_host={{ item.public_dns_name }}"
+  with_items: "{{ result.instances }}"
+  tags: [aws,amzn2]
+
+- name: Add EC2 vm name to [cluster managers] in ansible hosts file
+  vars:
+    item_name: "{{ item.tags.Name }}"
+  lineinfile:
+    dest: "{{ playbook_dir }}/inventory/hosts"
+    insertafter: "# master"
+    line: "{{ item_name }}"
+  with_items: "{{ result.instances }}"
+  when: item_name is search("master")
+  tags: [aws]
+
+- name: Add EC2 vm name to [cluster workers] in ansible hosts file
+  vars:
+    item_name: "{{ item.tags.Name }}"
+  lineinfile:
+    dest: "{{ playbook_dir }}/inventory/hosts"
+    insertafter: "# worker"
+    line: "{{ item_name }}"
+  with_items: "{{ result.instances }}"
+  when: item_name is search("worker")
+  tags: [aws]
+
+- name: Add EC2 vm name to [gluster] in ansible hosts file
+  vars:
+    item_name: "{{ item.tags.Name }}"
+  lineinfile:
+    dest: "{{ playbook_dir }}/inventory/hosts"
+    insertafter: "# gluster"
+    line: "g-{{ item.tags.Name | regex_replace('_', '-') }}"
+  with_items: "{{ result.instances }}"
+  tags: [aws]
+
+- name: Set access right to SSH keys
+  shell: "VBoxManage list vms"
+  register: virtualbox_vm_list
+  tags: [aws]

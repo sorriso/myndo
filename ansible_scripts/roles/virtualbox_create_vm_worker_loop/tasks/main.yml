@@ -1,0 +1,10 @@
+---
+- name: Loop on worker creation
+  include_role:
+    name: virtualbox_create_vm_worker
+  vars:
+    myworkertoken: "{{ cluster_vm_name_prefix }}-worker-{{ instance_group_letter }}-{{ worker_idx }}"
+  with_sequence: start=1 end={{ vm_worker_instance_count }}
+  loop_control:
+         loop_var: worker_idx
+  tags: [virtualbox]

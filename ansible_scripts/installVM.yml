@@ -1,0 +1,106 @@
+---
+#
+# AWS instance installation
+#
+
+- name:  Install instance 1 on 3 (aws)
+  hosts: cluster_all
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include aws env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+    - name: include vault for aws env
+      include_vars: "./vars/credentials.{{ vm_env }}.vault.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_common
+    - installation_vm_docker
+    - installation_vm_firewall_common
+    - installation_vm_firewall_gluster
+    - installation_vm_glusterfs
+    - installation_vm_glusterfs_hdd
+    - installation_vm_glusterfs_config0
+  tags: [aws]
+
+- name:  Install instance 2 on 3 (aws)
+  hosts: cluster_managers
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include aws env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+    - name: include vault for aws env
+      include_vars: "./vars/credentials.{{ vm_env }}.vault.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_glusterfs_config1
+  tags: [aws]
+
+- name:  Install instance 3 on 3 (aws)
+  hosts: cluster_all
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include aws env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+    - name: include vault for aws env
+      include_vars: "./vars/credentials.{{ vm_env }}.vault.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_glusterfs_config2
+    - installation_vm_SElinux
+  tags: [aws]
+
+#
+# Virtualbox instance installation
+#
+
+- name:  Install instance 1 on 3 (virtualbox / centos)
+  hosts: cluster_all
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_common
+    - installation_vm_docker
+    - installation_vm_firewall_common
+    - installation_vm_firewall_gluster
+    - installation_vm_glusterfs
+    - installation_vm_glusterfs_hdd
+    - installation_vm_glusterfs_config0
+  tags: [virtualbox]
+
+- name:  Install instance 2 on 3 (virtualbox / centos)
+  hosts: cluster_managers
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_glusterfs_config1
+  tags: [virtualbox]
+
+- name:  Install instance 3 on 3 (virtualbox / centos)
+  hosts: cluster_all
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - installation_vm_glusterfs_config2
+    - installation_vm_SElinux
+  tags: [virtualbox]

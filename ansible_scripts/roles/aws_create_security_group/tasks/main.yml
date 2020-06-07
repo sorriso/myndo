@@ -1,0 +1,228 @@
+---
+# https://www.linuxschoolonline.com/use-ansible-to-build-and-manage-aws-ec2-instances/
+# https://docs.axway.com/bundle/SecureTransport_54_on_AWS_InstallationGuide_allOS_en_HTML5/page/Content/AWS/securitygroups/st-glusterFS-aws-sg.htm
+# https://gluster.readthedocs.io/en/release-3.7.0-1/Troubleshooting/troubleshootingFAQ/
+- name: Create a security group
+  ec2_group:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    name: "{{ aws_sec_grp_name }}"
+    description: The cluster security group
+    vpc_id: "{{ aws_vpc_id }}"
+    region: "{{ aws_region }}"
+    purge_rules: yes
+    purge_rules_egress: yes
+    purge_tags: yes
+    state: present
+    tags:
+      Name: "cluster1"
+    rules:
+    # standrad rules
+      # ssh
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: 0.0.0.0/0
+      # http
+      - proto: tcp
+        from_port: 80
+        to_port: 80
+        cidr_ip: 0.0.0.0/0
+      # https
+      - proto: tcp
+        from_port: 443
+        to_port: 443
+        cidr_ip: 0.0.0.0/0
+    # glusterfs
+      # Gluster Daemon
+      - proto: tcp
+        from_port: 24007
+        to_port: 24007
+        cidr_ip: 0.0.0.0/0
+      # Infiniband management (optional unless you are using IB)
+#      - proto: tcp
+#        from_port: 24008
+#        to_port: 24008
+#        cidr_ip: 0.0.0.0/0
+      # inline Gluster NFS server
+      - proto: tcp
+        from_port: 38465
+        to_port: 38467
+        cidr_ip: 0.0.0.0/0
+      # portmapper
+      - proto: udp
+        from_port: 111
+        to_port: 111
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 111
+        to_port: 111
+        cidr_ip: 0.0.0.0/0
+      # portmapper
+      - proto: tcp
+        from_port: 2049
+        to_port: 2049
+        cidr_ip: 0.0.0.0/0
+      # (GlusterFS versions 3.4 and later) – Each brick for every volume on your host requires it’s own port.
+      # For every new brick, one new port will be used starting at 24009 for GlusterFS versions below 3.4 and 49152 for version 3.4 and above.
+      # If you have one volume with two bricks, you will need to open 24009 – 24010 (or 49152 – 49153).
+      - proto: tcp
+        from_port: 49152
+        to_port: 49156
+        cidr_ip: 0.0.0.0/0
+      # 38465 – 38467 – this is required if you by the Gluster NFS service.
+    # dowker swarm
+      # for secure Docker client communication. This port is required for Docker Machine to work. Docker Machine is used to orchestrate Docker hosts (managers, worker)
+      - proto: tcp
+        from_port: 2376
+        to_port: 2376
+        cidr_ip: 0.0.0.0/0
+      # This port is used for communication between the nodes of a Docker Swarm or cluster. It only needs to be opened on manager nodes (managers)
+      - proto: tcp
+        from_port: 2377
+        to_port: 2377
+        cidr_ip: 0.0.0.0/0
+      # for communication among nodes (container network discovery) (managers, worker).
+      - proto: udp
+        from_port: 7946
+        to_port: 7946
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 7946
+        to_port: 7946
+        cidr_ip: 0.0.0.0/0
+      # for overlay network traffic (container ingress networking) (managers, worker).
+      - proto: udp
+        from_port: 4789
+        to_port: 4789
+        cidr_ip: 0.0.0.0/0
+
+    rules_egress:
+      - proto: all
+        cidr_ip: 0.0.0.0/0
+  register: security_group_results
+  tags: [aws,swarm]
+
+- name: Create a security group
+  ec2_group:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    name: "{{ aws_sec_grp_name }}"
+    description: The cluster security group
+    vpc_id: "{{ aws_vpc_id }}"
+    region: "{{ aws_region }}"
+    purge_rules: yes
+    purge_rules_egress: yes
+    purge_tags: yes
+    state: present
+    tags:
+      Name: "cluster1"
+    rules:
+    # standrad rules
+      # ssh
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: 0.0.0.0/0
+      # http
+      - proto: tcp
+        from_port: 80
+        to_port: 80
+        cidr_ip: 0.0.0.0/0
+      # https
+      - proto: tcp
+        from_port: 443
+        to_port: 443
+        cidr_ip: 0.0.0.0/0
+    # glusterfs
+      # Gluster Daemon
+      - proto: tcp
+        from_port: 24007
+        to_port: 24007
+        cidr_ip: 0.0.0.0/0
+      # Infiniband management (optional unless you are using IB)
+#      - proto: tcp
+#        from_port: 24008
+#        to_port: 24008
+#        cidr_ip: 0.0.0.0/0
+      # inline Gluster NFS server
+      - proto: tcp
+        from_port: 38465
+        to_port: 38467
+        cidr_ip: 0.0.0.0/0
+      # portmapper
+      - proto: udp
+        from_port: 111
+        to_port: 111
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 111
+        to_port: 111
+        cidr_ip: 0.0.0.0/0
+      # portmapper
+      - proto: tcp
+        from_port: 2049
+        to_port: 2049
+        cidr_ip: 0.0.0.0/0
+      # (GlusterFS versions 3.4 and later) – Each brick for every volume on your host requires it’s own port.
+      # For every new brick, one new port will be used starting at 24009 for GlusterFS versions below 3.4 and 49152 for version 3.4 and above.
+      # If you have one volume with two bricks, you will need to open 24009 – 24010 (or 49152 – 49153).
+      - proto: tcp
+        from_port: 49152
+        to_port: 49156
+        cidr_ip: 0.0.0.0/0
+      # 38465 – 38467 – this is required if you by the Gluster NFS service.
+    # k8
+      # kubernetes API server
+      - proto: tcp
+        from_port: 6443
+        to_port: 6443
+        cidr_ip: 0.0.0.0/0
+      # etcd server client API
+      - proto: tcp
+        from_port: 2379
+        to_port: 2380
+        cidr_ip: 0.0.0.0/0
+      # Kubelet API
+      - proto: tcp
+        from_port: 10250
+        to_port: 10250
+        cidr_ip: 0.0.0.0/0
+      # Kube scheduler
+      - proto: tcp
+        from_port: 10251
+        to_port: 10251
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 10252
+        to_port: 10252
+        cidr_ip: 0.0.0.0/0
+      # kube controller mabager
+      - proto: tcp
+        from_port: 10255
+        to_port: 10255
+        cidr_ip: 0.0.0.0/0
+
+    rules_egress:
+      - proto: all
+        cidr_ip: 0.0.0.0/0
+  register: security_group_results
+  tags: [aws,k8]
+
+- name: Display security group list 1
+  debug:
+    var: "{{ item }}"
+  with_items: "{{ security_group_results }}"
+  tags: [aws]
+
+- name: Get security group list
+  ec2_group_info:
+    region: "{{ aws_region }}"
+  register: security_group_list
+  tags: [aws]
+
+- name: Display security group list 2
+  debug:
+    var: "{{ item }}"
+  with_items: "{{ security_group_list }}"
+  tags: [aws]

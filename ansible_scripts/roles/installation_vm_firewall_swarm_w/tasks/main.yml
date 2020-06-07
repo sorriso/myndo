@@ -1,0 +1,32 @@
+---
+# swarm worker
+
+- name: Add FW rules for swarm / worker 1
+  become: true
+  command: firewall-cmd --add-port=2376/tcp --permanent
+  tags: [swarm]
+
+- name: Add FW rules for swarm / worker 2
+  become: true
+  command: firewall-cmd --add-port=7946/tcp --permanent
+  tags: [swarm]
+
+- name: Add FW rules for swarm / worker 3
+  become: true
+  command: firewall-cmd --add-port=7946/udp --permanent
+  tags: [swarm]
+
+- name: Add FW rules for swarm / worker 4
+  become: true
+  command: firewall-cmd --add-port=4789/udp --permanent
+  tags: [swarm]
+
+- name: Reload FW rules for swarm / worker
+  become: true
+  command: firewall-cmd --reload
+  tags: [swarm]
+
+- name: Restart swarm / worker
+  become: true
+  command: systemctl restart docker
+  tags: [swarm]

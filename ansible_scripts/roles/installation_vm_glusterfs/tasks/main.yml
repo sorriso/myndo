@@ -1,0 +1,127 @@
+---
+- name: Clean up previous gluster line in /etc/hosts file is any
+  become: true
+  lineinfile:
+    dest: "/etc/hosts"
+    regex: "^g-.*$"
+    state: absent
+    firstmatch: no
+    backup: no
+  tags: [common]
+
+- name: Get current list (centos)
+  set_fact: foo_item="{{ hostvars[item]['ansible_host'] }} {{ item }}"
+  with_items: "{{ groups['gluster'] }}"
+  register: foo_result
+  tags: [virtualbox]
+
+- name: make a list (centos)
+  set_fact: foo="{{ foo_result.results | map(attribute='ansible_facts.foo_item') | list }}"
+  tags: [virtualbox]
+
+- name: Set list to facts (centos)
+  set_fact: foo="{{ foo | list }}"
+  tags: [virtualbox]
+
+- name: Update /etc/hosts file (centos)
+  become: true
+  lineinfile:
+    dest: "/etc/hosts"
+    insertafter: "EOF"
+    line: "{{ item }}"
+  with_items: "{{ foo }}"
+  tags: [virtualbox]
+
+- name: Get instances facts (amzn2)
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  ec2_instance_info:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    region: "{{ aws_region }}"
+    filters:
+      "tag:Environment": "{{ vm_env }}"
+      "instance-state-name": "running"
+  register: result_instance_fact
+  tags: [aws]
+
+- name: Update /etc/hosts file (aws)
+  become: true
+  lineinfile:
+    dest: "/etc/hosts"
+    insertafter: "EOF"
+    line: "{{ item.private_ip_address }} g-{{ item.tags.Name | regex_replace('_', '-') }}"
+  with_items: "{{ result_instance_fact.instances }}"
+  tags: [aws]
+
+- name: Add Glusterfs repository (amzn2)
+  become: true
+  command: yum install -y centos-release-gluster
+  tags: [amzn2]
+
+- name: Activate PowerTools repository (amzn2)
+  become: true
+  command: dnf config-manager --set-enabled PowerTools
+  tags: [amzn2]
+
+- name: Install xfsprogs (amzn2)
+  become: true
+  command: yum install -y xfsprogs
+  tags: [amzn2]
+
+- name: Add Glusterfs repository (amzn2)
+  become: true
+  command: yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+  tags: [amzn2]
+
+- name: Install xfsprogs (amzn2)
+  become: true
+  command: yum update -y
+  tags: [amzn2]
+
+- name: Install glusterfs package (centos)
+  become: true
+  yum:
+    name:
+      - centos-release-gluster
+    state: present
+  tags: [centos]
+
+- name: Install glusterfs (centos)
+  become: true
+  yum:
+    name:
+      - glusterfs-server-{{ glusterfs_version }}
+      - glusterfs-{{ glusterfs_version }}
+    state: present
+  tags: [centos]
+
+- name: Install glusterfs (amzn2)
+  become: true
+  command: yum install -y glusterfs
+  tags: [amzn2]
+
+- name: enable sysv glusterfs service
+  become: true
+  service:
+      name: glusterd.service
+      enabled: yes
+  tags: [common]
+
+- name: Start glusterfs service
+  become: true
+  service:
+      name: glusterd.service
+      state: started
+  tags: [common]
+
+- name: Get glusterfs service status
+  become: true
+  command: systemctl status glusterd
+  register: gluster_status
+  tags: [common]
+
+- name: Display glusterfs service status
+  debug:
+    var: gluster_status.stdout
+  tags: [common]

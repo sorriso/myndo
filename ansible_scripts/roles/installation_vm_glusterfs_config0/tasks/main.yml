@@ -1,0 +1,5 @@
+---
+- name: Create glusterfs mount volume
+  become: true
+  command: mkdir -p /private/gfsbrick/gfsvol01
+  tags: [common]

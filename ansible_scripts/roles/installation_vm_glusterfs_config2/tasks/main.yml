@@ -1,0 +1,20 @@
+---
+- name: Create glusterfs mount volume
+  become: true
+  command: mkdir -p /private/mnt
+  tags: [common]
+
+- name: Make mount persistant on VM for gluster volume 1
+  become: true
+  command: sudo /bin/su -c "echo 'localhost:/gfsvol01 /private/mnt glusterfs defaults,_netdev,backupvolfile-server=localhost 0 0' >> /etc/fstab"
+  tags: [common]
+
+- name: Make mount persistant on VM for gluster volume 2
+  become: true
+  command: sudo mount.glusterfs localhost:/gfsvol01 /private/mnt
+  tags: [common]
+
+- name: Make mount persistant on VM for gluster volume 4
+  become: true
+  command: chown -R root:docker /private/mnt
+  tags: [common]

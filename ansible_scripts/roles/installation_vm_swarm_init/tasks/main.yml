@@ -1,0 +1,111 @@
+---
+# swarm master
+
+- name: Disabling swarm
+  become: yes
+  command: docker swarm leave --force
+  ignore_errors: yes
+  tags: [swarm]
+
+
+
+- name: initialize swarm cluster
+  become: yes
+  command: docker swarm init --advertise-addr={{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:2377
+  tags: [swarm,virtualbox]
+
+
+
+- name: Get instances facts (amzn2)
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  ec2_instance_info:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    region: "{{ aws_region }}"
+    filters:
+      "tag:Environment": "{{ vm_env }}"
+      "instance-state-name": "running"
+  register: result_instance_fact_swarm
+  tags: [swarm,aws]
+
+- name: initialize swarm cluster
+  become: yes
+  command: docker swarm init --advertise-addr={{ item.private_ip_address }}:2377
+  with_items: "{{ result_instance_fact_swarm.instances }}"
+  when: item is search(inventory_hostname)
+  tags: [swarm,aws]
+
+
+
+- name: get swarm worker token
+  become: yes
+  command: docker swarm join-token worker
+  register: swarm_worker_cmd
+  tags: [swarm]
+
+- name: Print swarm worker initialization token cmd
+  debug:
+    var: swarm_worker_cmd.stdout
+  tags: [swarm]
+
+- name: Create worker token file
+  vars:
+    regexp: '.*\s(docker.*2377).*'
+  copy:
+    content: "{{ swarm_worker_cmd.stdout | regex_search(regexp,'\\1') | first }}"
+    dest: /tmp/swarm-w-join-command
+    force: yes
+  tags: [swarm]
+
+- name: Store swarm worker token file into localhost var directory
+  become: true
+  fetch:
+    src: /tmp/swarm-w-join-command
+    dest: "{{ playbook_dir }}/vars/swarm-w-join-command"
+    flat: yes
+  tags: [swarm]
+
+- name: Remove worker token file from tmp folder
+  become: true
+  file:
+    path: /tmp/swarm-w-join-command
+    state: absent
+  tags: [swarm]
+
+
+
+- name: get swarm master token
+  become: yes
+  command: docker swarm join-token manager
+  register: swarm_master_cmd
+  tags: [swarm]
+
+- name: Print swarm master initialization token cmd
+  debug:
+    var: swarm_master_cmd.stdout
+  tags: [swarm]
+
+- name: Create master token file
+  vars:
+    regexp: '.*\s(docker.*2377).*'
+  copy:
+    content: "{{ swarm_master_cmd.stdout | regex_search(regexp,'\\1') | first }}"
+    dest: /tmp/swarm-m-join-command
+    force: yes
+  tags: [swarm]
+
+- name: Store swarm master token file into localhost var directory
+  become: true
+  fetch:
+    src: /tmp/swarm-m-join-command
+    dest: "{{ playbook_dir }}/vars/swarm-m-join-command"
+    flat: yes
+  tags: [swarm]
+
+- name: Remove master token file from tmp folder
+  become: true
+  file:
+    path: /tmp/swarm-m-join-command
+    state: absent
+  tags: [swarm]

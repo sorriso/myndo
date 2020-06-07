@@ -1,0 +1,55 @@
+---
+- name: display myvmtoken
+  debug: msg="{{ myvmtoken }}"
+
+- name: Get vm VBoxManage guestproperty
+  command: VBoxManage guestproperty get {{ myvmtoken }} /VirtualBox/GuestInfo/Net/0/V4/IP
+  register: vm_ip_cmd
+  tags: [virtualbox]
+
+- name: display 1
+  debug: msg="{{ vm_ip_cmd.stdout.split(' ')[1] }}"
+
+- name: Add vm IP for CLUSTER in ansible hosts file
+  lineinfile:
+    dest: "{{ playbook_dir }}/inventory/hosts"
+    insertafter: '# Hosts'
+    line: "{{ myvmtoken }} ansible_host={{ vm_ip_cmd.stdout.split(' ')[1] }}"
+  when: myvmtoken is search(cluster_vm_name_prefix)
+  tags: [virtualbox]
+
+- name: Add vm IP for GLUSTER in ansible hosts file
+  vars:
+    tmp1: "g-{{ myvmtoken | regex_replace('_', '-') }}"
+  lineinfile:
+    dest: "{{ playbook_dir }}/inventory/hosts"
+    insertafter: '# Hosts'
+    line: "{{ tmp1 }} ansible_host={{ vm_ip_cmd.stdout.split(' ')[1] }}"
+  when: myvmtoken is search(cluster_vm_name_prefix)
+  tags: [virtualbox]
+
+- name: Add vm name to [cluster_managers] in ansible hosts file
+  lineinfile:
+    dest: "{{ playbook_dir }}/inventory/hosts"
+    insertafter: "# master"
+    line: "{{ myvmtoken }}"
+  when: "'master' in myvmtoken"
+  tags: [virtualbox]
+
+- name: Add vm name to [cluster_workers] in ansible hosts file
+  lineinfile:
+    dest: "{{ playbook_dir }}/inventory/hosts"
+    insertafter: "# worker"
+    line: "{{ myvmtoken }}"
+  when: "'worker' in myvmtoken"
+  tags: [virtualbox]
+
+- name: Add vm name to [gluster] in ansible hosts file
+  vars:
+    tmp1: "g-{{ myvmtoken | regex_replace('_', '-') }}"
+  lineinfile:
+    dest: "{{ playbook_dir }}/inventory/hosts"
+    insertafter: "# gluster"
+    line: "{{ tmp1 }}"
+  when: myvmtoken is search(cluster_vm_name_prefix)
+  tags: [virtualbox]

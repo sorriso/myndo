@@ -1,0 +1,21 @@
+# Hosts
+localhost ansible_host=local
+
+[cluster_all:children]
+cluster_managers
+cluster_workers
+
+[cluster_all:vars]
+# config
+
+
+[cluster_managers]
+# master
+
+
+[cluster_workers]
+# worker
+
+
+[gluster]
+# gluster

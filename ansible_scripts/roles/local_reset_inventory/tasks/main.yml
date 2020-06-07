@@ -1,0 +1,78 @@
+---
+
+#
+# initialize ansible inventory file
+#
+
+- name: Remove old host file
+  file:
+    path: "{{ playbook_dir }}/inventory/hosts"
+    state: absent
+  tags: [common]
+
+- name: Copy new host file
+  copy:
+    src: "{{ playbook_dir }}/templates/hosts.template"
+    dest: "{{ playbook_dir }}/inventory/hosts"
+  tags: [common]
+
+- name: Set access right to SSH keys
+  shell: "chmod 600 {{ playbook_dir }}/vars/*_key.pem"
+  tags: [common]
+
+- name: Delete files admin.conf
+  file:
+    path: "{{ playbook_dir }}/vars/admin.conf"
+    state: absent
+  tags: [common]
+
+- name: Delete files k8-join-command
+  file:
+    path: "{{ playbook_dir }}/vars/k8-join-command"
+    state: absent
+  tags: [common]
+
+
+- name: Add config 1 on 3 (virtualbox)
+  lineinfile:
+    dest: "{{ playbook_dir }}/inventory/hosts"
+    insertafter: "# config"
+    line: "ansible_ssh_private_key_file = ~/.ssh/id_rsa"
+  tags: [virtualbox]
+
+- name: Add config 2 on 3 (virtualbox)
+  lineinfile:
+    dest: "{{ playbook_dir }}/inventory/hosts"
+    insertafter: "# config"
+    line: "ansible_ssh_user=ansible"
+  tags: [virtualbox]
+
+- name: Add config 3 on 3 (virtualbox)
+  lineinfile:
+    dest: "{{ playbook_dir }}/inventory/hosts"
+    insertafter: "# config"
+    line: "ansible_ssh_password=centos"
+  tags: [virtualbox]
+
+
+- name: Add config 1 on 2 (aws)
+  lineinfile:
+    dest: "{{ playbook_dir }}/inventory/hosts"
+    insertafter: "# config"
+    line: "ansible_ssh_private_key_file={{ playbook_dir }}/vars/{{ aws_key_name }}.pem"
+  tags: [aws]
+
+- name: Add config 2 on 2 (aws,centos)
+  lineinfile:
+    dest: "{{ playbook_dir }}/inventory/hosts"
+    insertafter: "# config"
+    line: "ansible_ssh_user=centos"
+  tags: [centos]
+
+
+- name: Add config 2 on 2 (aws,amzn2)
+  lineinfile:
+    dest: "{{ playbook_dir }}/inventory/hosts"
+    insertafter: "# config"
+    line: "ansible_ssh_user=ec2-user"
+  tags: [amzn2]

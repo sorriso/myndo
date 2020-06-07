@@ -1,0 +1,37 @@
+---
+# swarm  master
+
+- name: Add FW rules for swarm / master 1
+  become: true
+  command: firewall-cmd --add-port=2376/tcp --permanent
+  tags: [swarm]
+
+- name: Add FW rules for swarm / master 2
+  become: true
+  command: firewall-cmd --add-port=2377/tcp --permanent
+  tags: [swarm]
+
+- name: Add FW rules for swarm / master 3
+  become: true
+  command: firewall-cmd --add-port=7946/tcp --permanent
+  tags: [swarm]
+
+- name: Add FW rules for swarm / master 4
+  become: true
+  command: firewall-cmd --add-port=7946/udp --permanent
+  tags: [swarm]
+
+- name: Add FW rules for swarm / master 5
+  become: true
+  command: firewall-cmd --add-port=4789/udp --permanent
+  tags: [swarm]
+
+- name: Reload FW rules for swarm / master
+  become: true
+  command: firewall-cmd --reload
+  tags: [swarm]
+
+- name: Restart swarm / master
+  become: true
+  command: systemctl restart docker
+  tags: [swarm]

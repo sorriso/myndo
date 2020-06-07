@@ -1,0 +1,10 @@
+---
+- name: Loop on master creation
+  include_role:
+    name: virtualbox_create_vm_master
+  vars:
+    mymastertoken: "{{ cluster_vm_name_prefix }}-master-{{ instance_group_letter }}-{{ master_idx }}"
+  with_sequence: start=1 end={{ vm_master_instance_count }}
+  loop_control:
+         loop_var: master_idx
+  tags: [virtualbox]

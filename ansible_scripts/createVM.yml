@@ -1,0 +1,135 @@
+---
+#
+# Common tasks
+#
+
+- name:  Reset inventory file
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include aws env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+    - name: include vault for aws env
+      include_vars: "./vars/credentials.{{ vm_env }}.vault.yml"
+  roles:
+    - local_reset_inventory
+    - delete_vm_clean_files
+  tags: [common]
+
+#
+# AWS instance creation
+#
+
+- name:  Build EC2 master instance
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include aws env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+    - name: include vault for aws env
+      include_vars: "./vars/credentials.{{ vm_env }}.vault.yml"
+  vars:
+    instance_name: "master-{{ instance_group_letter }}-"
+    instance_type: "{{ ami_master_instance_type }}"
+    instance_count: "{{ ami_master_instance_count }}"
+  roles:
+    - aws_delete_security_group
+    - aws_create_security_group
+    - aws_create_ec2_instance
+  tags: [aws]
+
+- name:  Build EC2 worker instance
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include aws env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+    - name: include vault for aws env
+      include_vars: "./vars/credentials.{{ vm_env }}.vault.yml"
+  vars:
+    instance_name: "worker-{{ instance_group_letter }}-"
+    instance_type: "{{ ami_worker_instance_type }}"
+    instance_count: "{{ ami_worker_instance_count }}"
+  roles:
+    - aws_create_ec2_instance
+  tags: [aws]
+
+- name:  Update inventory file (aws)
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include aws env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+    - name: include vault for aws env
+      include_vars: "./vars/credentials.{{ vm_env }}.vault.yml"
+  roles:
+    - local_update_inventory_aws
+  tags: [aws]
+
+#
+# Virtual local instance creation
+#
+
+- name:  Create vm reposository
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+  roles:
+    - virtualbox_set_context
+  tags: [virtualbox]
+
+- name:  Create masters
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+  roles:
+    - virtualbox_create_vm_master_loop
+  tags: [virtualbox]
+
+- name:  Create workers
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+  roles:
+    - virtualbox_create_vm_worker_loop
+  tags: [virtualbox]
+
+- name:  Update inventory file (virtualbox)
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include aws env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+  roles:
+    - local_update_inventory_virtualbox
+  tags: [virtualbox]

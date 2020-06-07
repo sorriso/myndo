@@ -1,0 +1,130 @@
+---
+- name: Remove old docker version
+  become: true
+  yum:
+    name:
+      - docker
+      - docker-client
+      - docker-client-latest
+      - docker-common
+      - docker-latest
+      - docker-latest-logrotate
+      - docker-logrotate
+      - docker-engine
+    state: absent
+  tags: [centos]
+
+- name: Install docker dependencies 1 on 2 (centos)
+  become: true
+  yum:
+    name: dnf-plugins-core
+    state: present
+  tags: [centos]
+
+- name: Install docker dependencies 2 on 2 (centos)
+  become: true
+  yum:
+    name:
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
+    state: present
+  tags: [centos]
+
+- name: Add Docker repository (centos)
+  become: true
+  command: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  tags: [centos]
+
+- name: Install Docker (centos)
+  become: true
+  yum:
+    name:
+      - docker-ce-{{ docker_version }}
+    state: present
+  tags: [centos]
+
+- name: Install Docker (amz2)
+  become: true
+  command: sudo amazon-linux-extras install -y docker
+  tags: [amzn2]
+
+- name: Install curl
+  become: true
+  yum:
+    name: curl
+    state: present
+  tags: [common]
+
+- name: Get last version number of Docker-compose
+  command: "curl -s https://api.github.com/repos/docker/compose/releases/latest"
+  register: curl_results
+  tags: [common]
+
+- name: Print last version number of Docker-compose
+  set_fact:
+    COMPOSE_VERSION: "{{ curl_results.stdout | regex_search(regexp,'\\1') | first }}"
+  vars:
+    regexp: '.*tag_name.*:\s\"(.*)\",.*'
+  tags: [common]
+
+- name: Print last version number of Docker-compose
+  debug:
+    var: COMPOSE_VERSION
+  tags: [common]
+
+- name: Rmemove old Docker-compose version file
+  become: true
+  command: rm -f /usr/local/bin/docker-compose
+  tags: [common]
+
+- name: Get last Docker-compose version file
+  become: true
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64"
+    dest: /usr/local/bin/docker-compose
+  tags: [common]
+
+- name: Make last Docker-compose version executable
+  become: true
+  shell: chmod +x /usr/local/bin/docker-compose
+  tags: [common]
+
+- name: Make last Docker-compose version executable
+  become: true
+  command: mkdir -p /etc/docker
+  tags: [common]
+
+- name: Set up the Docker daemon config - native.cgroupdriver systemd
+  become: true
+  copy:
+    content: |
+              {
+                "exec-opts": ["native.cgroupdriver=systemd"],
+                "log-driver": "json-file",
+                "log-opts": {
+                  "max-size": "100m"
+                },
+                "storage-driver": "overlay2"
+              }
+    dest: /etc/docker/daemon.json
+  tags: [common]
+
+- name: Reload system daemon
+  become: true
+  command: systemctl daemon-reload
+  tags: [common]
+
+- name: enable sysv dockerd service
+  become: true
+  service:
+      name: docker.service
+      enabled: yes
+  tags: [common]
+
+- name: Start service
+  become: true
+  service:
+      name: docker.service
+      state: started
+  tags: [common]

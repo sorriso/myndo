@@ -1,0 +1,48 @@
+---
+- name: Create k8 folder config
+  become: yes
+  command: mkdir -p /home/ansible/.kube
+  tags: [k8]
+
+- name: Run the Kubernetes cluster as std user 2 on 2
+  become: true
+  copy:
+    src: "{{ playbook_dir }}/vars/admin.conf"
+    dest: /home/ansible/.kube/admin.conf
+    owner: ansible
+    group: sudo
+    force: yes
+  tags: [k8]
+
+- name: Update .bashrc with KUBECONFIG
+  become: true
+  lineinfile:
+    dest: "/home/ansible/.bashrc"
+    insertafter: "EOF"
+    line: "export KUBECONFIG=/home/ansible/.kube/admin.conf"
+  with_items: "{{ foo }}"
+  tags: [k8]
+
+- name: export KUBECONFIG in shell
+  become: true
+  command: "export KUBECONFIG=/home/ansible/.kube/admin.conf"
+  tags: [k8]
+
+- name: Copy the join command to remote host
+  copy:
+    src: "{{ playbook_dir }}/vars/k8-join-command"
+    dest: "/tmp/"
+    mode: 0777
+  tags: [k8]
+
+- name: Join the node to cluster
+  become: true
+  command: sh /tmp/k8-join-command
+  tags: [k8]
+
+- name: Remove token file from tmp folder
+  become: true
+  file:
+    path: /tmp/k8-join-command
+    state: absent
+  tags: [k8]

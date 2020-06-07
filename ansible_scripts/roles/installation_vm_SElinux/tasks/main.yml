@@ -1,0 +1,14 @@
+---
+- name: Disable SElinux to permissive mode 1 on 2 (for the moment)
+  ignore_errors: yes
+  become: true
+  command: setenforce 0
+  tags: [common]
+
+- name: Disable SElinux to permissive mode 2 on 2 (for the moment)
+  become: true
+  replace:
+    path: /etc/selinux/config
+    regexp: 'SELINUX=enforcing'
+    replace: "SELINUX=permissive"
+  tags: [common]

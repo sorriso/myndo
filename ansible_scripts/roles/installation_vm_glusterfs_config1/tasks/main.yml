@@ -1,0 +1,124 @@
+---
+
+- name: Get current host list (centos virtualbox)
+  set_fact: foo_item2="{{ hostvars[host_idx0]['ansible_host'] }} {{ host_idx0 }}"
+  with_items: "{{ groups['gluster'] }}"
+  loop_control:
+         loop_var: host_idx0
+  register: foo_result2
+  tags: [virtualbox,centos]
+
+- name: make a list (centos virtualbox)
+  set_fact: foo2="{{ foo_result2.results | map(attribute='ansible_facts.foo_item2') | list }}"
+  tags: [virtualbox,centos]
+
+- name: Set list to facts (centos virtualbox)
+  set_fact: foo2="{{ foo2 | list }}"
+  tags: [virtualbox,centos]
+
+- name: Create glusterfs cluster (centos virtualbox)
+  become: true
+  command: gluster peer probe {{ host_idx1.split(' ')[1] }}
+  with_items: "{{ foo2 }}"
+  loop_control:
+         loop_var: host_idx1
+  register: gluster_node
+  tags: [virtualbox,centos]
+
+- name: Get gluster host list (centos virtualbox)
+  vars:
+    volume_path: ":/private/gfsbrick/gfsvol01"
+  set_fact: foo_item3="{{ host_idx2 }}{{ volume_path }}"
+  with_items: "{{ groups['gluster'] | regex_replace('\\s+', '') }}"
+  loop_control:
+         loop_var: host_idx2
+  register: foo_result3
+  tags: [virtualbox,centos]
+
+- name: Create gluster cmd init list (centos)
+  set_fact: glustercmdline="{{ foo_result3.results | map(attribute='ansible_facts.foo_item3') | list | join(' ') }}"
+  tags: [virtualbox,centos]
+
+
+
+
+- name: Get gluster host list (aws)
+  ec2_instance_info:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    region: "{{ aws_region }}"
+    filters:
+      "tag:Environment": "{{ vm_env }}"
+      "instance-state-name": "running"
+  register: result_instance_fact2
+  tags: [aws]
+
+- name: Create glusterfs cluster (aws)
+  become: true
+  command: gluster peer probe g-{{ item.tags.Name  | regex_replace('_', '-') }}
+  with_items: "{{ result_instance_fact2.instances }}"
+  register: gluster_node
+  tags: [aws]
+
+
+
+- name: Get glusterfs cluster status (aws)
+  become: true
+  command: gluster peer status
+  register: gluster_status
+  tags: [common]
+
+- name: Get gluster pool list (aws)
+  become: true
+  command: gluster pool list
+  register: gluster_pool
+  tags: [common]
+
+- debug: msg="{{ gluster_pool.stdout }}"
+  tags: [common]
+
+  
+
+- name: Get aws gluster host list (aws)
+  vars:
+    volume_path: ":/private/gfsbrick/gfsvol01"
+  set_fact: foo_item="g-{{ item.tags.Name  | regex_replace('_', '-') }}{{ volume_path }}"
+  with_items: "{{ result_instance_fact2.instances }}"
+  register: foo_result
+  tags: [aws]
+
+- name: Create gluster cmd init list (aws)
+  set_fact: glustercmdline="{{ foo_result.results | map(attribute='ansible_facts.foo_item') | list | join(' ') }}"
+  tags: [aws]
+
+
+
+- name: DEBUG Display gluster cmd
+  vars:
+    HOST_COUNT: "{{ groups['gluster'] | length }}"
+  debug: msg="gluster volume create gfsvol01 replica {{ HOST_COUNT }} transport tcp {{ glustercmdline }} force"
+  tags: [common]
+
+- name: Create glusterfs volume
+  vars:
+    HOST_COUNT: "{{ groups['gluster'] | length }}"
+  become: true
+  command: gluster volume create gfsvol01 replica {{ HOST_COUNT }} transport tcp {{ glustercmdline }} force
+  register: gluster_volume_creation
+  tags: [common]
+
+- name: Start glusterfs mount volume
+  become: true
+  command: gluster volume start gfsvol01
+  register: gluster_volume_start
+  failed_when: gluster_volume_start.stdout not is search("success")
+  tags: [common]
+
+- name: Get gluster volume info
+  become: true
+  command: gluster volume info all
+  register: gluster_volume_info
+  tags: [common]
+
+- debug: msg="{{ gluster_volume_info.stdout }}"
+  tags: [common]

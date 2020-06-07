@@ -1,0 +1,31 @@
+---
+- name:  Delete EC2 instances
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include aws env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+    - name: include vault for aws env
+      include_vars: "./vars/credentials.{{ vm_env }}.vault.yml"
+  roles:
+    - aws_delete_security_group
+    - aws_delete_ec2_instance
+    - delete_vm_clean_files
+  tags: [aws]
+
+- name:  Delete virtualbox vm instances
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+  roles:
+    - virtualbox_delete_all_vm_instance
+    - delete_vm_clean_files
+  tags: [virtualbox]

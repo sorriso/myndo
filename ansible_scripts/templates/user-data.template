@@ -1,0 +1,59 @@
+#cloud-config
+hostname: _HOSTNAME
+users:
+  - name: ansible
+    groups:
+      - sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh-authorized-keys:
+      - _SSKPUBKEY
+chpasswd:
+  list: |
+    ansible:(ansible)
+  expire: False
+write_files:
+  - path: /etc/ssh/sshd_config
+    permissions: 0644
+    content: |
+      #	custom config to ensure it will work anyway
+      Port 22
+      ListenAddress ::
+      Protocol 2
+      HostKey /etc/ssh/ssh_host_rsa_key
+      KeyRegenerationInterval 1h
+      ServerKeyBits 1024
+      SyslogFacility AUTH
+      LogLevel INFO
+      PermitRootLogin yes
+      RSAAuthentication yes
+      DSAAuthentication no
+      PubkeyAuthentication yes
+      AllowUsers root ansible
+      Ciphers aes128-ctr,aes192-ctr,aes256-ctr
+      MACs hmac-ripemd160,hmac-sha2-256,hmac-sha2-512,hmac-ripemd160@openssh.com
+      KexAlgorithms diffie-hellman-group-exchange-sha256
+      AuthorizedKeysFile	.ssh/authorized_keys
+      RhostsRSAAuthentication no
+      HostbasedAuthentication no
+      IgnoreUserKnownHosts no
+      IgnoreRhosts yes
+      PermitEmptyPasswords no
+      PasswordAuthentication yes
+      ChallengeResponseAuthentication no
+      KerberosAuthentication no
+      GSSAPIAuthentication yes
+      GSSAPICleanupCredentials no
+      UsePAM yes
+      AllowAgentForwarding no
+      AllowTcpForwarding no
+      GatewayPorts no
+      X11Forwarding no
+      PermitTTY no
+      UsePrivilegeSeparation sandbox
+      UseDNS yes
+      PidFile /var/run/sshd.pid
+      PermitTunnel no
+      ChrootDirectory none
+      VersionAddendum none
+      Banner none

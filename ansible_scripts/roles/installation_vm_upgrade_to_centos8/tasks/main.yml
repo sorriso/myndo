@@ -1,0 +1,215 @@
+---
+  # https://www.tecmint.com/upgrade-centos-7-to-centos-8/
+- name: Clean local repo
+  become: true
+  yum:
+    autoremove: yes
+  tags: [centos]
+
+- name: Clean cache
+  become: true
+  yum:
+    update_cache: yes
+  tags: [centos]
+
+- name: upgrade all packages (centos)
+  become: true
+  yum:
+    name: '*'
+    state: latest
+  tags: [centos]
+
+- name: Clean cache
+  become: true
+  yum:
+    update_cache: yes
+  tags: [centos]
+
+- name: Install official gpp centos key
+  become: true
+  command: curl -O /etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official
+  tags: [centos]
+
+- name: Install official gpp EPEL key
+  become: true
+  command: curl -O /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8 http://mirror.in2p3.fr/pub/epel/RPM-GPG-KEY-EPEL-8
+  tags: [centos]
+
+- name: Install the EPEL Repository
+  become: true
+  command: yum install epel-release -y
+  tags: [centos]
+
+- name: Patch the EPEL Repository to version 8
+  become: true
+  replace:
+    path: /etc/yum.repos.d/epel.repo
+    regexp: '7'
+    replace: "8"
+  tags: [centos]
+  
+- name: Install yum-utils Tools
+  become: true
+  command: yum install yum-utils -y
+  tags: [centos]
+
+- name: resolves RPM packages 1/2
+  become: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  command: yum install rpmconf -y
+  register: install_rpmconf
+  tags: [centos]
+
+- name: display rpmconf install result
+  ignore_errors: yes
+  debug:
+    var: msg={{ install_rpmconf }}
+  tags: [centos]
+
+- name: Install python dependancy 1/3 = pip install script
+  become: true
+  command: yum -y update
+  tags: [centos]
+
+- name: Clean cache
+  become: true
+  yum:
+    update_cache: yes
+  tags: [centos]
+
+- name: Install python dependancy 2/3 = run pip install script
+  become: true
+  command: yum -y install python-pip
+  tags: [centos]
+
+- name: Install python dependancy = upgrade pip
+  become: true
+  command: pip install --upgrade pip
+  tags: [centos]
+
+- name: Install python dependancy = install pexpect lib
+  become: true
+  command: pip install pexpect
+  tags: [centos]
+
+- name: Install python3 dependancy = install pexpect lib
+  become: true
+  command: pip3 install pexpect
+  tags: [centos]
+
+- name: Resolves RPM packages 2/2 (no yes)
+  become: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  expect:
+    command: rpmconf -a
+    responses:
+        Question:
+          - no
+          - yes
+  register: response_rpmconf
+  tags: [centos]
+
+- name: display rpmconf execution result
+  ignore_errors: yes
+  debug:
+    var: msg={{ response_rpmconf }}
+  tags: [centos]
+
+- name: clean-up of all the packages 1/2
+  become: true
+  command: package-cleanup --leaves
+  tags: [centos]
+
+- name: Clean-up of all the packages 2/2
+  become: true
+  command: package-cleanup --orphans
+  tags: [centos]
+
+- name: Install the dnf in CentOS 7
+  become: true
+  command: yum install dnf -y
+  tags: [centos]
+
+- name: remove the yum package manager 1/2
+  become: true
+  command: dnf -y remove yum yum-metadata-parser
+  tags: [centos]
+
+- name: remove the yum package manager 2/2
+  become: true
+  command: rm -Rf /etc/yum
+  tags: [centos]
+
+- name: Updating a system with DNF
+  become: true
+  command: dnf upgrade -y --refresh
+  tags: [centos]
+
+- name: Install CentOS 8 release package 1/3
+  become: true
+  command: dnf upgrade http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/centos-repos-8.1-1.1911.0.8.el8.x86_64.rpm
+  tags: [centos]
+
+- name: Install CentOS 8 release package 2/3
+  become: true
+  command: dnf install http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/centos-release-8.1-1.1911.0.8.el8.x86_64.rpm
+  tags: [centos]
+
+- name: Install CentOS 8 release package 3/3
+  become: true
+  command: dnf install http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/centos-gpg-keys-8.1-1.1911.0.9.el8.noarch.rpm
+  tags: [centos]
+
+- name: Upgrade the EPEL repository
+  become: true
+  command: dnf -y upgrade https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+  tags: [centos]
+
+- name: Remove all the temporary files
+  become: true
+  command: dnf clean all
+  tags: [centos]
+
+- name: Remove the old kernel core for CentOS 7
+  become: true
+  command: rpm -e `rpm -q kernel`
+  tags: [centos]
+
+- name: Remove conflicting packages
+  become: true
+  command: rpm -e --nodeps sysvinit-tools
+  tags: [centos]
+
+- name: Launch the CentOS 8 system upgrade as shown
+  become: true
+  command: dnf -y --releasever=8 --allowerasing --setopt=deltarpm=false distro-sync
+  tags: [centos]
+
+- name: Install the New Kernel Core for CentOS 8
+  become: true
+  command: dnf -y install kernel-core
+  tags: [centos]
+
+- name: Install CentOS 8 minimal package
+  become: true
+  command: dnf -y groupupdate "Core" "Minimal Install"
+  tags: [centos]
+
+- name: Attempting reboot
+  shell: reboot
+  async: 1200
+  poll: 0
+  tags: [centos]
+
+- name: Waiting for resurection
+  wait_for_connection:
+    delay: 60
+    timeout: 300
+  tags: [centos]
+
+- name: Display CentOS 8 version
+  debug:
+    vars: msg="{{ echo | cat /etc/redhat-release }}"
+  tags: [centos]

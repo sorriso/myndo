@@ -1,0 +1,97 @@
+---
+- name: DEBUG mymastertoken
+  debug: msg="{{ mymastertoken }}"
+  tags: [virtualbox]
+
+- name: Create master folder
+  command: mkdir "{{ playbook_dir }}/tmp/{{ mymastertoken }}"
+  tags: [virtualbox]
+
+- name: Create config folder
+  command: mkdir "{{ playbook_dir }}/tmp/{{ mymastertoken }}/config"
+  tags: [virtualbox]
+
+- name: Add files in config folder
+  command: cp {{ playbook_dir }}/templates/user-data.template {{ playbook_dir }}/tmp/{{ mymastertoken }}/config/user-data
+  tags: [virtualbox]
+
+- name: Add meta-data file in config folder
+  command: cp {{ playbook_dir }}/templates/meta-data.template {{ playbook_dir }}/tmp/{{ mymastertoken }}/config/meta-data
+  tags: [virtualbox]
+
+- name: Ansible hostname string in meta-data
+  replace:
+    path: "{{ playbook_dir }}/tmp/{{ mymastertoken }}/config/meta-data"
+    regexp: '_HOSTMANE'
+    replace: "{{ mymastertoken }}"
+  tags: [virtualbox]
+
+- name: Read ssh pub key
+  command: cat  ~/.ssh/id_rsa.pub
+  register: local_pub_ssh_key
+  tags: [virtualbox]
+
+- name: Add client/user pub ssh key in VM boot configuration
+  replace:
+    path: "{{ playbook_dir }}/tmp/{{ mymastertoken }}/config/user-data"
+    regexp: '_SSKPUBKEY'
+    replace: "{{ local_pub_ssh_key.stdout }}"
+  tags: [virtualbox]
+
+- name: Create export folder
+  command: "mkdir {{ playbook_dir }}/tmp/{{ mymastertoken }}/config/export"
+  tags: [virtualbox]
+
+- name: Read docker image list
+  command: docker image ls
+  register: local_docker_ls
+  tags: [virtualbox]
+
+- name: Remove multiple space in docker image list response
+  debug: msg="{{ item | regex_replace('\\s+', ' ') }}"
+  with_items: "{{ local_docker_ls.stdout_lines }}"
+  register: local_docker_ls_trim
+  tags: [virtualbox]
+
+- name: Export docker image
+  vars:
+    subtoken: "{{ docker_item.msg.split(' ')[0] | regex_replace('/','') }}"
+    token_docker: "{{ docker_item.msg.split(' ')[0] }}:{{ docker_item.msg.split(' ')[1] }}"
+    token_name: "{{ subtoken }}-{{ docker_item.msg.split(' ')[1] }}.tar"
+    export_path : "{{ playbook_dir }}/tmp/{{ mymastertoken }}/config/export"
+  command:
+    cmd: "echo 1" #"docker save -o '{{ token_name }}' '{{ token_docker }}'"
+    chdir: "{{ export_path }}"
+  with_items: "{{ local_docker_ls_trim.results }}"
+  loop_control:
+         loop_var: docker_item
+  when: not docker_item is search("REPOSITORY")
+  tags: [virtualbox]
+
+- name: Generate ISO file
+  command: "hdiutil makehybrid -o {{ playbook_dir }}/tmp/{{ mymastertoken }}/init.iso -hfs -joliet -iso -default-volume-name cidata {{ playbook_dir }}/tmp/{{ mymastertoken }}/config/"
+  tags: [virtualbox]
+
+- name: VM provisionning
+  command: "VBoxManage import {{ playbook_dir }}/vars/{{ ova_image_name }} --vsys 0 --vmname {{ mymastertoken }}"
+  tags: [virtualbox]
+
+- name: VM configuration master
+  command: "VBoxManage modifyvm {{ mymastertoken }} --cpus 2 --memory 1024 --vram 33 --nic1 natnetwork --nat-network1 natnet1"
+  tags: [virtualbox]
+
+- name: VM boot iso linking
+  command: "VBoxManage storageattach {{ mymastertoken }} --storagectl IDE --port 0 --device 0 --type dvddrive --medium {{ playbook_dir }}/tmp/{{ mymastertoken }}/init.iso"
+  tags: [virtualbox]
+
+- name: Create glusterfs HDD
+  command: "VBoxManage createhd --filename {{ playbook_dir }}/tmp/{{ mymastertoken }}/clustedfshdd.vdi --size 1000 --format VDI --variant Standard"
+  tags: [virtualbox]
+
+- name: Mount glusterfs HDD
+  command: "VBoxManage storageattach {{ mymastertoken }} --storagectl 'SATA' --port 1 --device 0 --type hdd --medium {{ playbook_dir }}/tmp/{{ mymastertoken }}/clustedfshdd.vdi"
+  tags: [virtualbox]
+
+- name: VM start
+  command: "VBoxManage startvm {{ mymastertoken }} --type headless"
+  tags: [virtualbox]

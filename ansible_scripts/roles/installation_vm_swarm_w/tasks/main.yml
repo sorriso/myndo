@@ -1,0 +1,27 @@
+---
+# swarm worker
+
+- name: leaving older swarm
+  become: yes
+  ignore_errors: yes
+  command: docker swarm leave --force
+  tags: [swarm]
+
+- name: Copy the worker join command to remote host
+  copy:
+    src: "{{ playbook_dir }}/vars/swarm-w-join-command"
+    dest: "/tmp/"
+    mode: 0777
+  tags: [swarm]
+
+- name: Join the node to swarm cluster as worker
+  become: true
+  command: sh /tmp/swarm-w-join-command
+  tags: [swarm]
+
+- name: Remove worker token file from tmp folder
+  become: true
+  file:
+    path: /tmp/swarm-w-join-command
+    state: absent
+  tags: [swarm]

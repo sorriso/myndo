@@ -1,0 +1,8 @@
+---
+- name: Delete old a security group
+  ignore_errors: yes
+  ec2_group:
+    region: "{{ aws_region }}"
+    name: "{{ aws_sec_grp_name }}"
+    state: absent
+  tags: [aws]

@@ -1,0 +1,4 @@
+---
+- name: Create tmp folder
+  command: mkdir "{{ playbook_dir }}/tmp"
+  tags: [virtualbox]

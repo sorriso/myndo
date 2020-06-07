@@ -1,0 +1,33 @@
+---
+# openssl rand -base64 2048 > ./ansible_scripts/vars/vault.sandbox.pass
+# ansible-vault create ./ansible_scripts/vars/aws_credentials.sandbox.vault.yml --vault-password-file ./ansible_scripts/vars/vault.sandbox.pass
+# ansible-vault edit ./ansible_scripts/vars/aws_credentials.sandbox.vault.yml --vault-password-file ./ansible_scripts/vars/vault.sandbox.pass
+- name:  Create vm reposository from aws
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include aws env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+    - name: include vault for aws env
+      include_vars: "./vars/credentials.{{ vm_env }}.vault.yml"
+  roles:
+    - local_reset_inventory
+    - local_update_inventory_aws
+  tags: [aws]
+
+- name:  Create vm reposository from aws
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+  roles:
+    - local_reset_inventory
+    - local_update_inventory_virtualbox
+  tags: [virtualbox]

@@ -1,0 +1,13 @@
+---
+- name:  Create security group
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  pre_tasks:
+    - name: include aws env vars
+      include_vars: "./vars/aws_config.{{ vm_env }}.yml"
+    - name: include vault for env
+      include_vars: "./vars/aws_credentials.{{ vm_env }}.vault.yml"
+  roles:
+    - aws_create_security_group
+  tags: [aws]

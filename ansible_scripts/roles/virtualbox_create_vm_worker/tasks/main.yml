@@ -1,0 +1,67 @@
+---
+- name: Print myworkertoken
+  debug: msg="{{ myworkertoken }}"
+  tags: [virtualbox]
+
+- name: Create worker folder
+  command: mkdir "{{ playbook_dir }}/tmp/{{ myworkertoken }}"
+  tags: [virtualbox]
+
+- name: Create config folder
+  command: "mkdir {{ playbook_dir }}/tmp/{{ myworkertoken }}/config"
+  tags: [virtualbox]
+
+- name: Add files in config folder
+  command: "cp {{ playbook_dir }}/templates/user-data.template {{ playbook_dir }}/tmp/{{ myworkertoken }}/config/user-data"
+  tags: [virtualbox]
+
+- name: Add meta-data file in config folder
+  command: "cp {{ playbook_dir }}/templates/meta-data.template {{ playbook_dir }}/tmp/{{ myworkertoken }}/config/meta-data"
+  tags: [virtualbox]
+
+- name: Ansible hostname string in meta-data
+  replace:
+    path: "{{ playbook_dir }}/tmp/{{ myworkertoken }}/config/meta-data"
+    regexp: '_HOSTMANE'
+    replace: "{{ myworkertoken }}"
+  tags: [virtualbox]
+
+- name: Read ssh pub key
+  command: cat  ~/.ssh/id_rsa.pub
+  register: local_pub_ssh_key
+  tags: [virtualbox]
+
+- name: Add client/user pub ssh key in VM boot configuration
+  replace:
+    path: "{{ playbook_dir }}/tmp/{{ myworkertoken }}/config/user-data"
+    regexp: '_SSKPUBKEY'
+    replace: "{{ local_pub_ssh_key.stdout }}"
+  tags: [virtualbox]
+
+- name: Generate ISO file
+  command: hdiutil makehybrid -o {{ playbook_dir }}/tmp/{{ myworkertoken }}/init.iso -hfs -joliet -iso -default-volume-name cidata {{ playbook_dir }}/tmp/{{ myworkertoken }}/config/
+  tags: [virtualbox]
+
+- name: VM provisionning
+  command: "VBoxManage import {{ playbook_dir }}/vars/{{ ova_image_name }} --vsys 0 --vmname {{ myworkertoken }}"
+  tags: [virtualbox]
+
+- name: VM configuration master
+  command: "VBoxManage modifyvm {{ myworkertoken }} --cpus 1 --memory 1024 --vram 33 --nic1 natnetwork --nat-network1 natnet1"
+  tags: [virtualbox]
+
+- name: VM boot iso linking
+  command: "VBoxManage storageattach {{ myworkertoken }} --storagectl IDE --port 0 --device 0 --type dvddrive --medium {{ playbook_dir }}/tmp/{{ myworkertoken }}/init.iso"
+  tags: [virtualbox]
+
+- name: Create glusterfs HDD
+  command: "VBoxManage createhd --filename {{ playbook_dir }}/tmp/{{ myworkertoken }}/clustedfshdd.vdi --size 1000 --format VDI --variant Standard"
+  tags: [virtualbox]
+
+- name: Mount glusterfs HDD
+  command: "VBoxManage storageattach {{ myworkertoken }} --storagectl 'SATA' --port 1 --device 0 --type hdd --medium {{ playbook_dir }}/tmp/{{ myworkertoken }}/clustedfshdd.vdi"
+  tags: [virtualbox]
+
+- name: VM start
+  command: "VBoxManage startvm {{ myworkertoken }} --type headless"
+  tags: [virtualbox]
