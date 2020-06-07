@@ -19,23 +19,23 @@ This solution is based on opens source and/of aws free-tier solution:
 # summary
 | vm provider   | operating system   | cluster solution     | network type   | available  | create vm  | install vm  | create cluster |
 | ------------- | ------------------ | -------------------- | -------------- | ---------- | ---------- | ----------- | -------------- |
-| virtualbox    | centos 7           | swarm                | default        | nok        | ok         | ok          | nok            |
-| virtualbox    | centos 7           | kubernetes (k8)      | calico         | nok        | ok         | ok          | nok            |
-| virtualbox    | centos 7           | kubernetes (k8)      | flannel        | nok        | ok         | ok          | nok            |
-| aws           | centos 7 ami       | swarm                | default        | ok         | ok         | ok          | ok             |
-| aws           | centos 7 ami       | kubernetes (k8)      | calico         | nok        | ok         | ok          | nok            |
-| aws           | centos 7 ami       | kubernetes (k8)      | flannel        | nok        | ok         | ok          | nok            |
-| aws           | amazon linux 2 ami | swarm                | default        | nok        | nok        | nok         | nok            |
-| aws           | amazon linux 2 ami | kubernetes (k8)      | calico         | nok        | nok        | nok         | nok            |
-| aws           | amazon linux 2 ami | kubernetes (k8)      | flannel        | nok        | nok        | nok         | nok            |
+| virtualbox    | centos 7           | swarm                | default        | nok  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) `#f03c15`     | ok         | ok          | nok            |
+| virtualbox    | centos 7           | kubernetes (k8)      | calico         | nok  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) `#f03c15`     | ok         | ok          | nok            |
+| virtualbox    | centos 7           | kubernetes (k8)      | flannel        | nok  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) `#f03c15`     | ok         | ok          | nok            |
+| aws           | centos 7 ami       | swarm                | default        | ok   ![#c5f015](https://placehold.it/15/c5f015/000000?text=+) `#c5f015`      | ok         | ok          | ok             |
+| aws           | centos 7 ami       | kubernetes (k8)      | calico         | nok  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) `#f03c15`      | ok         | ok          | nok            |
+| aws           | centos 7 ami       | kubernetes (k8)      | flannel        | nok  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) `#f03c15`      | ok         | ok          | nok            |
+| aws           | amazon linux 2 ami | swarm                | default        | nok  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) `#f03c15`      | nok        | nok         | nok            |
+| aws           | amazon linux 2 ami | kubernetes (k8)      | calico         | nok  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) `#f03c15`      | nok        | nok         | nok            |
+| aws           | amazon linux 2 ami | kubernetes (k8)      | flannel        | nok  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) `#f03c15`      | nok        | nok         | nok            |
 
 
 # Operating system used on vm
-| vm provider | operating system                                        | user           | pwd             |
-| ----------- | ------------------------------------------------------- | -------------- | --------------- |
-| virtualbox  | centos 7 (tested with CentOS-7-x86_64-Minimal-2003.iso) | ansible  | centos (if you change it, you will have to update scripts) |
-| aws         | centos 7 ami   (free tier)                              | ansible  | N/A ssh key used |
-| aws         | amazon linux 2 (free tier)                              | ec2-user | N/A ssh key used |
+| vm provider | operating system                                        | user           | pwd                                                        |
+| ----------- | ------------------------------------------------------- | -------------- | ---------------------------------------------------------- |
+| virtualbox  | centos 7 (tested with CentOS-7-x86_64-Minimal-2003.iso) | ansible        | centos (if you change it, you will have to update scripts) |
+| aws         | centos 7 ami   (free tier)                              | ansible        | N/A ssh key used                                           |
+| aws         | amazon linux 2 (free tier)                              | ec2-user       | N/A ssh key used                                           |
 
 
 # Micro services file system
@@ -67,6 +67,7 @@ the minimum size of the cluster is 1 master and 2 workers (default configuration
       - once the button "restart" available when the instalatino is done,
         - shutdown the vm,
         - replace the "centos 7 installation iso" by the "VBoxGuestAdditions_x.y.z.iso" to its cdrom drive
+        - configure network as bridge in virtualbox's vm configuration panel
         - restart the vm
     - once restarted, login as root, and enable ip / networking capability:
       - vi /etc/sysconfig/network-scripts/ifcfg-enp0s3
