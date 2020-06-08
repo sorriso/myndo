@@ -37,3 +37,4 @@ tmp/
 vault.*.pass
 *_key.pem
 *rsa*
+*join-command

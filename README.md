@@ -21,7 +21,7 @@ This solution is based on opens source and/of aws free-tier solution:
 # summary
 | vm provider   | operating system   | cluster solution     | network type   | available  | create vm  | install vm  | create cluster |
 | ------------- | ------------------ | -------------------- | -------------- | ---------- | ---------- | ----------- | -------------- |
-| virtualbox    | centos 7           | swarm                | default        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      | ok         | ok          | nok            |
+| virtualbox    | centos 7           | swarm                | default        |  ![#f03c15](https://placehold.it/15/c5f015/000000?text=+)      | ok         | ok          | ok             |
 | virtualbox    | centos 7           | kubernetes (k8)      | calico         |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      | ok         | ok          | nok            |
 | virtualbox    | centos 7           | kubernetes (k8)      | flannel        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      | ok         | ok          | nok            |
 | aws           | centos 7 ami       | swarm                | default        |  ![#c5f015](https://placehold.it/15/c5f015/000000?text=+)      | ok         | ok          | ok             |
