@@ -1,3 +1,5 @@
+# this is an proof of concept tool, backup your all data before using it, I will be responsible of any issue due to its use.
+
 # Purpose
 A tool (for unix environment) aiming to:
 * automate cluster installation hosting micro service (i.e. containers)
@@ -33,7 +35,7 @@ This solution is based on opens source and/of aws free-tier solution:
 # Operating system used on vm
 | vm provider | operating system                                        | user           | pwd                                                        |
 | ----------- | ------------------------------------------------------- | -------------- | ---------------------------------------------------------- |
-| virtualbox  | centos 7 (tested with CentOS-7-x86_64-Minimal-2003.iso) | ansible        | centos (if you change it, you will have to update scripts) |
+| virtualbox  | centos 7 (tested with CentOS-7-x86_64-Minimal-2003.iso) | ansible        | centos                                                     |
 | aws         | centos 7 ami   (free tier)                              | ansible        | N/A ssh key used                                           |
 | aws         | amazon linux 2 (free tier)                              | ec2-user       | N/A ssh key used                                           |
 
@@ -112,20 +114,20 @@ the minimum size of the cluster is 1 master and 2 workers (default configuration
   - ansible-vault create ./credentials.aws_sandbox.vault.yml --vault-password-file ./vault.aws_sandbox.pass
   - ansible-vault edit ./credentials.aws_sandbox.vault.yml --vault-password-file ./vault.aws_sandbox.pass
   - add our credential (from aws management console)
-  - aws_access_key: XXXXXXXXXXXXX
-  - aws_secret_key: YYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+    - aws_access_key: XXXXXXXXXXXXX
+    - aws_secret_key: YYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
 
 # Accessing to vm via ssh
 * virtualbox
-    CentOS
-      ssh ansible@<ip from ansible inventory file> -i  ~/.ssh/id_rsa
+  - CentOS
+    - ssh ansible@<ip from ansible inventory file> -i  ~/.ssh/id_rsa
 * aws
-  get <vm dns name> from aws administration console / ec2
-  ssh centos@192.168.0.27 -i /Users/olivier/.ssh/id_rsa
-  CentOS
-    ssh centos@<vm dns name> -i  <myndo_root>/ansible_scripts/vars/sandbox_key.pem
-  amazon linux 2:
-    ssh ec2-user@<vm dns name> -i  <myndo_root>/ansible_scripts/vars/sandbox_key.pem
+  - get <vm dns name> from aws administration console / ec2
+  - ssh centos@192.168.0.27 -i /Users/olivier/.ssh/id_rsa
+   - CentOS
+     - ssh centos@<vm dns name> -i  <myndo_root>/ansible_scripts/vars/sandbox_key.pem
+   - amazon linux 2:
+     - ssh ec2-user@<vm dns name> -i  <myndo_root>/ansible_scripts/vars/sandbox_key.pem
 
 # Using micro services through the created cluster
 * swarm

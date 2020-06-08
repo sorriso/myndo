@@ -1,25 +1,5 @@
 ---
 #
-# Common tasks
-#
-
-- name:  Reset inventory file
-  hosts: localhost
-  connection: local
-  gather_facts: true
-  pre_tasks:
-    - name: include VM env vars
-      include_vars: "./vars/vm_config.yml"
-    - name: include aws env vars
-      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
-    - name: include vault for aws env
-      include_vars: "./vars/credentials.{{ vm_env }}.vault.yml"
-  roles:
-    - local_reset_inventory
-    - delete_vm_clean_files
-  tags: [common]
-
-#
 # AWS instance creation
 #
 
@@ -39,6 +19,7 @@
     instance_type: "{{ ami_master_instance_type }}"
     instance_count: "{{ ami_master_instance_count }}"
   roles:
+    - local_reset_files
     - aws_delete_security_group
     - aws_create_security_group
     - aws_create_ec2_instance
@@ -92,6 +73,7 @@
     - name: include VM env vars
       include_vars: "./vars/vm_config.{{ vm_env }}.yml"
   roles:
+    - local_reset_files
     - virtualbox_set_context
   tags: [virtualbox]
 

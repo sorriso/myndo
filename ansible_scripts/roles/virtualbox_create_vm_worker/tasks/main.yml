@@ -47,7 +47,7 @@
   tags: [virtualbox]
 
 - name: VM configuration master
-  command: "VBoxManage modifyvm {{ myworkertoken }} --cpus 1 --memory 1024 --vram 33 --nic1 natnetwork --nat-network1 natnet1"
+  command: "VBoxManage modifyvm {{ myworkertoken }} --cpus 1 --memory 1024 --vram 33 --nic1 bridged"
   tags: [virtualbox]
 
 - name: VM boot iso linking

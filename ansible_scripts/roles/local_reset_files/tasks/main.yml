@@ -1,8 +1,50 @@
 ---
 
-#
-# initialize ansible inventory file
-#
+- name: Clean tmp folder
+  ignore_errors: yes
+  command:  rm -rf "{{ playbook_dir }}/tmp"
+  tags: [virtualbox]
+
+- name: Remove old ansible inventory file
+  file:
+    path: "{{ playbook_dir }}/inventory/hosts"
+    state: absent
+  tags: [common]
+
+- name: Copy new ansible inventory file
+  copy:
+    src: "{{ playbook_dir }}/templates/hosts.template"
+    dest: "{{ playbook_dir }}/inventory/hosts"
+  tags: [common]
+
+- name: Remove all cluster token files 1
+  ignore_errors: yes
+  file:
+    path: "{{ playbook_dir }}/vars/swarm-m-join-command"
+    state: absent
+  tags: [common]
+
+- name: Remove all cluster token files 2
+  ignore_errors: yes
+  file:
+    path: "{{ playbook_dir }}/vars/swarm-w-join-command"
+    state: absent
+  tags: [common]
+
+- name: Remove all cluster token files 3
+  ignore_errors: yes
+  file:
+    path: "{{ playbook_dir }}/vars/k8-m-join-command"
+    state: absent
+  tags: [common]
+
+- name: Remove all cluster token files 4
+  ignore_errors: yes
+  file:
+    path: "{{ playbook_dir }}/vars/k8-w-join-command"
+    state: absent
+  tags: [common]
+
 
 - name: Remove old host file
   file:
@@ -33,25 +75,18 @@
   tags: [common]
 
 
-- name: Add config 1 on 3 (virtualbox)
+- name: Add config 1 on 2 (virtualbox)
   lineinfile:
     dest: "{{ playbook_dir }}/inventory/hosts"
     insertafter: "# config"
     line: "ansible_ssh_private_key_file = ~/.ssh/id_rsa"
   tags: [virtualbox]
 
-- name: Add config 2 on 3 (virtualbox)
+- name: Add config 2 on 2 (virtualbox)
   lineinfile:
     dest: "{{ playbook_dir }}/inventory/hosts"
     insertafter: "# config"
     line: "ansible_ssh_user=ansible"
-  tags: [virtualbox]
-
-- name: Add config 3 on 3 (virtualbox)
-  lineinfile:
-    dest: "{{ playbook_dir }}/inventory/hosts"
-    insertafter: "# config"
-    line: "ansible_ssh_password=centos"
   tags: [virtualbox]
 
 
@@ -67,7 +102,7 @@
     dest: "{{ playbook_dir }}/inventory/hosts"
     insertafter: "# config"
     line: "ansible_ssh_user=centos"
-  tags: [centos]
+  tags: [aws,centos]
 
 
 - name: Add config 2 on 2 (aws,amzn2)
@@ -75,4 +110,4 @@
     dest: "{{ playbook_dir }}/inventory/hosts"
     insertafter: "# config"
     line: "ansible_ssh_user=ec2-user"
-  tags: [amzn2]
+  tags: [aws,amzn2]

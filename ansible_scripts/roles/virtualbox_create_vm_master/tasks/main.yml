@@ -43,17 +43,20 @@
   tags: [virtualbox]
 
 - name: Read docker image list
+  ignore_errors: yes
   command: docker image ls
   register: local_docker_ls
   tags: [virtualbox]
 
 - name: Remove multiple space in docker image list response
+  ignore_errors: yes
   debug: msg="{{ item | regex_replace('\\s+', ' ') }}"
   with_items: "{{ local_docker_ls.stdout_lines }}"
   register: local_docker_ls_trim
   tags: [virtualbox]
 
 - name: Export docker image
+  ignore_errors: yes
   vars:
     subtoken: "{{ docker_item.msg.split(' ')[0] | regex_replace('/','') }}"
     token_docker: "{{ docker_item.msg.split(' ')[0] }}:{{ docker_item.msg.split(' ')[1] }}"
@@ -77,7 +80,7 @@
   tags: [virtualbox]
 
 - name: VM configuration master
-  command: "VBoxManage modifyvm {{ mymastertoken }} --cpus 2 --memory 1024 --vram 33 --nic1 natnetwork --nat-network1 natnet1"
+  command: "VBoxManage modifyvm {{ mymastertoken }} --cpus 2 --memory 1024 --vram 33 --nic1 bridged"
   tags: [virtualbox]
 
 - name: VM boot iso linking

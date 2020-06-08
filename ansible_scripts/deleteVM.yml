@@ -13,7 +13,7 @@
   roles:
     - aws_delete_security_group
     - aws_delete_ec2_instance
-    - delete_vm_clean_files
+    - local_reset_files
   tags: [aws]
 
 - name:  Delete virtualbox vm instances
@@ -27,5 +27,5 @@
       include_vars: "./vars/vm_config.{{ vm_env }}.yml"
   roles:
     - virtualbox_delete_all_vm_instance
-    - delete_vm_clean_files
+    - local_reset_files
   tags: [virtualbox]

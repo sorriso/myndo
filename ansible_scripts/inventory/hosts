@@ -1,4 +1,10 @@
 # Hosts
+g-c1-worker-A-2 ansible_host=192.168.0.25
+c1-worker-A-2 ansible_host=192.168.0.25
+g-c1-worker-A-1 ansible_host=192.168.0.46
+c1-worker-A-1 ansible_host=192.168.0.46
+g-c1-master-A-1 ansible_host=192.168.0.34
+c1-master-A-1 ansible_host=192.168.0.34
 localhost ansible_host=local
 
 [cluster_all:children]
@@ -7,15 +13,23 @@ cluster_workers
 
 [cluster_all:vars]
 # config
+ansible_ssh_user=ansible
+ansible_ssh_private_key_file = ~/.ssh/id_rsa
 
 
 [cluster_managers]
 # master
+c1-master-A-1
 
 
 [cluster_workers]
 # worker
+c1-worker-A-2
+c1-worker-A-1
 
 
 [gluster]
 # gluster
+g-c1-worker-A-2
+g-c1-worker-A-1
+g-c1-master-A-1

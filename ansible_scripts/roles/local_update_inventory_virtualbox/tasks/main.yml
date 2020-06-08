@@ -28,7 +28,8 @@
     path: "{{ playbook_dir }}/vars/virtualbox_vmlist.txt"
     regexp: '\"'
     replace: ''
-
+  tags: [virtualbox]
+  
 - name: Loop vm list files
   include_role:
     name: virtualbox_set_host_ansible_file_for_vm
