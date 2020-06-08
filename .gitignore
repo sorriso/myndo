@@ -38,3 +38,5 @@ vault.*.pass
 *_key.pem
 *rsa*
 *join-command
+virtualbox_*list.txt
+hosts

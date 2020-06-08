@@ -1,0 +1,13 @@
+---
+- name: leaving older swarm
+  become: yes
+  ignore_errors: yes
+  command: docker swarm leave --force
+  tags: [swarm_workers]
+
+- name: join nodes to manager
+  become: yes
+  vars:
+    tmp: "{{ hostvars[\"centos8-master-1\"].swarm_worker_cmd | replace('\n', '') }}"
+  command: "{{ tmp }}"
+  tags: [swarm_workers]

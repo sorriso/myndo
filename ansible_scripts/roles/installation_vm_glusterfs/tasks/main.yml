@@ -57,12 +57,7 @@
 - name: Add Glusterfs repository (amzn2)
   become: true
   command: yum install -y centos-release-gluster
-  tags: [amzn2]
-
-- name: Activate PowerTools repository (amzn2)
-  become: true
-  command: dnf config-manager --set-enabled PowerTools
-  tags: [amzn2]
+  tags: [centos]
 
 - name: Install xfsprogs (amzn2)
   become: true
@@ -72,11 +67,6 @@
 - name: Add Glusterfs repository (amzn2)
   become: true
   command: yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-  tags: [amzn2]
-
-- name: Install xfsprogs (amzn2)
-  become: true
-  command: yum update -y
   tags: [amzn2]
 
 - name: Install glusterfs package (centos)
@@ -91,14 +81,18 @@
   become: true
   yum:
     name:
-      - glusterfs-server-{{ glusterfs_version }}
-      - glusterfs-{{ glusterfs_version }}
+      - glusterfs-server-{{ glusterfs_version_centos }}
+      - glusterfs-{{ glusterfs_version_centos }}
     state: present
   tags: [centos]
 
 - name: Install glusterfs (amzn2)
   become: true
-  command: yum install -y glusterfs
+  yum:
+    name:
+      - glusterfs-{{ glusterfs_version_amzn2 }}
+      - glusterfs-fuse-{{ glusterfs_version_amzn2 }}
+    state: present
   tags: [amzn2]
 
 - name: enable sysv glusterfs service

@@ -1,0 +1,23 @@
+aws_region: "eu-west-3"
+aws_vpc_id: "vpc-39554a50"
+aws_vpc_cidr_block: "172.31.0.0/16"
+aws_vpc_sub_id: "subnet-5e792425"
+aws_vpc_sub_cidr_block: "172.31.16.0/20"
+aws_sec_grp_name: "cluster_sec_grp_1"
+aws_key_name: "sandbox_key"
+ami_owner: "679593333241"
+ami_family: "CentOS Linux 7 x86_64 HVM EBS ENA*"
+ami_master_instance_type: "t2.micro"
+ami_master_instance_count: 1
+ami_worker_instance_type: "t2.micro"
+ami_worker_instance_count: 1
+
+# free tier elligible
+# CentOS Linux 7 x86_64 HVM EBS ENA 2002_01-b7ee8a69-ee97-4a49-9e68-afaee216db2e-ami-0042af67f8e4dcc20.4 (ami-0cb72d2e599cffbf9)
+# amzn2-ami-hvm-2.0.20200406.0-x86_64-gp2 (ami-00077e3fed5089981) amazon linux 2
+# amzn2-ami-ecs-hvm-2.0.20200430-x86_64-ebs (ami-032a9f3e531acca53) optimized amazon linux 2
+
+#
+# ssh -i ./ansible_scripts/vars/sandbox_key.pem ec2-user@ec2-15-188-79-68.eu-west-3.compute.amazonaws.com
+#
+# ssh -i ./ansible_scripts/vars/sandbox_key.pem centos@ec2-15-236-204-3.eu-west-3.compute.amazonaws.com

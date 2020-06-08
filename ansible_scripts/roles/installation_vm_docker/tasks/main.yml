@@ -40,13 +40,16 @@
   become: true
   yum:
     name:
-      - docker-ce-{{ docker_version }}
+      - docker-ce-{{ docker_version_centos }}
     state: present
   tags: [centos]
 
-- name: Install Docker (amz2)
+- name: Install Docker (amzn2)
   become: true
-  command: sudo amazon-linux-extras install -y docker
+  yum:
+    name:
+      - docker-{{ docker_version_amzn2 }}
+    state: present
   tags: [amzn2]
 
 - name: Install curl

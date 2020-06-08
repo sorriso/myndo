@@ -35,7 +35,7 @@ This solution is based on opens source and/of aws free-tier solution:
 # Operating system used on vm
 | vm provider | operating system                                        | user           | pwd                                                        |
 | ----------- | ------------------------------------------------------- | -------------- | ---------------------------------------------------------- |
-| virtualbox  | centos 7 (tested with CentOS-7-x86_64-Minimal-2003.iso) | ansible        | centos                                                     |
+| virtualbox  | centos 7 (tested with CentOS-7-x86_64-Minimal-2003.iso and VBoxGuestAdditions_6.1.8.iso) | ansible        | centos                                                     |
 | aws         | centos 7 ami   (free tier)                              | ansible        | N/A ssh key used                                           |
 | aws         | amazon linux 2 (free tier)                              | ec2-user       | N/A ssh key used                                           |
 
@@ -57,6 +57,7 @@ the minimum size of the cluster is 1 master and 2 workers (default configuration
 - during vm's installation:
   - the latest version are used, except for docker, docker-compose, glusterfs and k8 (version fixed in configuration files)
   - regarding amazon ami, the latest version that is available in the "aws region" is used at vm creation.
+  - execution of scripts are based on an environment selector (local_virtualbox, aws_sandbox_centos, aws_sandbox_amzn2) to use the right configuration files
 
 
 # Preparation for virtualbox use:
@@ -112,10 +113,11 @@ the minimum size of the cluster is 1 master and 2 workers (default configuration
   - cd <myndo_root>/ansible_scripts/vars
   - openssl genrsa -out ./vault.aws_sandbox.pass 2048
   - ansible-vault create ./credentials.aws_sandbox.vault.yml --vault-password-file ./vault.aws_sandbox.pass
-  - ansible-vault edit ./credentials.aws_sandbox.vault.yml --vault-password-file ./vault.aws_sandbox.pass
+  - ansible-vault edit ./credentials.aws_sandbox_centos.vault.yml --vault-password-file ./vault.aws_sandbox.pass
   - add our credential (from aws management console)
     - aws_access_key: XXXXXXXXXXXXX
     - aws_secret_key: YYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+  - duplicate this file as "credentials.aws_sandbox_amzn2.vault.yml"
 
 # Accessing to vm via ssh
 * virtualbox

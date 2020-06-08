@@ -77,7 +77,7 @@
 - debug: msg="{{ gluster_pool.stdout }}"
   tags: [common]
 
-  
+
 
 - name: Get aws gluster host list (aws)
   vars:
@@ -111,7 +111,6 @@
   become: true
   command: gluster volume start gfsvol01
   register: gluster_volume_start
-  failed_when: gluster_volume_start.stdout not is search("success")
   tags: [common]
 
 - name: Get gluster volume info

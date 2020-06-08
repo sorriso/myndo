@@ -4,13 +4,19 @@ vm_worker_instance_count: 2
 os_volume_size: 8
 gluster_volume_size: 1
 instance_group_letter: "A"
-glusterfs_version: "7.5-1.el7"
-docker_version: "19.03.11-3.el7"
+# centos
+glusterfs_version_centos: "7.5-1.el7"
+docker_version_centos: "19.03.11-3.el7"
+k8_version_centos: "1.18.3-0"
+# amz2
+glusterfs_version_amzn2: "3.8.4-18.4.amzn2.0.1" # "3.8.4-53.amzn2.0.2"
+docker_version_amzn2: "19.03.6ce-3.amzn2" # "19.03.6ce-4.amzn2"
+k8_version_amzn2: "1.18.3-0"
+# common
 docker_compose_version: "1.26.0"
-k8_version: "1.18.3-0"
 
 # to get latest available version
 # sudo yum --showduplicates list docker-ce
 # sudo yum --showduplicates list kubelet
-# sudo yum --showduplicates list gluster
+# sudo yum --showduplicates list gluster*
 # curl -s https://api.github.com/repos/docker/compose/releases/latest  -> look at "tag_name" value

@@ -5,25 +5,13 @@
   ec2_ami_info:
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
-    owners: "{{ ami_owner_1 }}"
+    owners: "{{ ami_owner }}"
     region: "{{ aws_region }}"
     filters:
       block-device-mapping.volume-type: "gp2"
-      name: "{{ ami_family_1 }}"
+      name: "{{ ami_family }}"
   register: amis
-  tags: [aws,amzn2]
-
-- name: Find latest ami instance-id (centos / family 3)
-  ec2_ami_info:
-    aws_access_key: "{{ aws_access_key }}"
-    aws_secret_key: "{{ aws_secret_key }}"
-    owners: "{{ ami_owner_3 }}"
-    region: "{{ aws_region }}"
-    filters:
-      block-device-mapping.volume-type: "gp2"
-      name: "{{ ami_family_3 }}"
-  register: amis
-  tags: [aws,centos7]
+  tags: [aws]
 
 - name:  Register AMI ID
   vars:
@@ -78,4 +66,41 @@
       Environment: "{{ vm_env }}"
   with_items: "{{ uuid_list.results }}"
   register: ec2
-  tags: [aws]
+  tags: [aws,centos]
+
+- name: Create EC2 instance
+  vars:
+    item_name: "{{ instance_name }}_{{ ansible_date_time.epoch }}"
+  ec2_instance:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    region: "{{ aws_region }}"
+    key_name: "{{ aws_key_name }}"
+    vpc_subnet_id: "{{ aws_vpc_sub_id }}"
+    security_group: "{{ aws_sec_grp_name }}"
+    instance_type: "{{ instance_type }}"
+    image_id: "{{my_ami.image_id}}"
+    instance_ids: "{{ item.stdout }}"
+    detailed_monitoring: no
+    state: "running"
+    wait:  true
+    wait_timeout: 600
+    user_data: |
+      #!/bin/bash
+      sudo yum install -y python3
+
+    volumes:
+    - device_name: /dev/xvda
+      ebs:
+        volume_size: "{{ os_volume_size }}"
+        delete_on_termination: true
+    - device_name: /dev/xvdb
+      ebs:
+        volume_size: "{{ gluster_volume_size }}"
+        delete_on_termination: true
+    tags:
+      Name: "{{ instance_name }}{{ ansible_date_time.epoch }}"
+      Environment: "{{ vm_env }}"
+  with_items: "{{ uuid_list.results }}"
+  register: ec2
+  tags: [aws,amzn2]

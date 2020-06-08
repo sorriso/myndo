@@ -26,7 +26,7 @@
     state: latest
   tags: [amzn2]
 
-- name: install required ansible packages
+- name: install required ansible packages :firewalld
   become: true
   yum:
     name: firewalld
@@ -59,12 +59,17 @@
   shell: pip3 install boto3
   tags: [common]
 
-- name: add epel-release packages
+- name: add epel-release packages (centos)
   become: true
   yum:
     name: 'epel-release'
     state: present
-  tags: [common]
+  tags: [centos]
+
+- name: add epel-release packages (amzn2)
+  become: true
+  command: yum-config-manager --enable epel
+  tags: [amzn2]
 
 - name: install pip packages for pyhton 2.7
   become: true

@@ -2,10 +2,6 @@
 #
 # Fill ansible inventory file for AWS VM provider
 #
-- name: sleep for 15 seconds to let vm to stop and continue with playbook
-  wait_for:
-    timeout: 15
-  tags: [common]
 
 - name: Get EC2 instances facts
   ec2_instance_info:

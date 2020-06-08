@@ -5,7 +5,7 @@
 start=`date +%s`
 
 export ANSIBLE_CONFIG=./ansible.cfg
-ansible-playbook ./ansible_scripts/deleteVM.yml --extra-vars "vm_env=local_virtualbox" --vault-password-file ./ansible_scripts/vars/vault.aws_sandbox.pass --skip-tags=aws,amzn2
+ansible-playbook ./ansible_scripts/deleteVM.yml --extra-vars "vm_env=aws_sandbox_amzn2" --vault-password-file ./ansible_scripts/vars/vault.aws_sandbox.pass --skip-tags=virtualbox,amzn2
 
 end=`date +%s`
 
