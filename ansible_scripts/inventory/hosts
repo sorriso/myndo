@@ -1,4 +1,8 @@
 # Hosts
+g-worker-A-1591716880 ansible_host=ec2-15-236-20-179.eu-west-3.compute.amazonaws.com
+g-master-A-1591716700 ansible_host=ec2-15-236-123-64.eu-west-3.compute.amazonaws.com
+worker-A-1591716880 ansible_host=ec2-15-236-20-179.eu-west-3.compute.amazonaws.com
+master-A-1591716700 ansible_host=ec2-15-236-123-64.eu-west-3.compute.amazonaws.com
 localhost ansible_host=local
 
 [cluster_all:children]
@@ -13,11 +17,15 @@ ansible_ssh_private_key_file=/Users/olivier/Documents/GitHub/myndo/ansible_scrip
 
 [cluster_managers]
 # master
+master-A-1591716700
 
 
 [cluster_workers]
 # worker
+worker-A-1591716880
 
 
 [gluster]
 # gluster
+g-worker-A-1591716880
+g-master-A-1591716700

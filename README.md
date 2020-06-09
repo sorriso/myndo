@@ -25,7 +25,6 @@ This solution is based on opens source and/of aws free-tier solution:
 | virtualbox    | centos 7           | swarm                | default        |  ![#f03c15](https://placehold.it/15/c5f015/000000?text=+)      |
 |               |                    | kubernetes (k8)      | calico         |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      |
 |               |                    | kubernetes (k8)      | flannel        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      |
-
 | aws           | centos 7 ami       | swarm                | default        |  ![#c5f015](https://placehold.it/15/c5f015/000000?text=+)      |
 |               |                    | kubernetes (k8)      | calico         |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      |
 |               |                    | kubernetes (k8)      | flannel        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      |
@@ -40,7 +39,6 @@ This solution is based on opens source and/of aws free-tier solution:
 | virtualbox    | centos 7           | swarm                | default        |            |             |            |
 |               | centos 7           | kubernetes (k8)      | calico         |            |             |            |
 |               | centos 7           | kubernetes (k8)      | flannel        |            |             |            |
-
 | aws           | centos 7 ami       | swarm                | default        | 12 mn 30 s |             |            |
 |               |                    | kubernetes (k8)      | calico         |            |             |            |
 |               |                    | kubernetes (k8)      | flannel        |            |             |            |
