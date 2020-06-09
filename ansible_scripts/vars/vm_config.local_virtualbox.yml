@@ -1,1 +1,3 @@
 ova_image_name: "CentOS_7_Minimal_baseline.ova"
+vm_master_instance_count: 1
+vm_worker_instance_count: 2

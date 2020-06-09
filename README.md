@@ -2,7 +2,7 @@
 
 
 # Purpose
-A tool (for unix environment) aiming to:
+A tool (only tested on unix environment yet) aiming to:
 * automate cluster installation hosting micro service (i.e. containers)
 * explore cluster configuration & use.
 * provide "sandboxing" capability to allow focusing on micro service / business usage -> do NOT used it "as is" for production (i.e harden / secure it before)
@@ -24,37 +24,40 @@ This solution is based on opens source and/of aws free-tier solution:
 | ------------- | ------------------ | -------------------- | -------------- | ---------- |
 | virtualbox    | centos 7           | swarm                | default        |  ![#f03c15](https://placehold.it/15/c5f015/000000?text=+)      |
 |               |                    | kubernetes (k8)      | calico         |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      |
-|               |                    | kubernetes (k8)      | flannel        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      |
+|               |                    |                      | flannel        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      |
 | aws           | centos 7 ami       | swarm                | default        |  ![#c5f015](https://placehold.it/15/c5f015/000000?text=+)      |
 |               |                    | kubernetes (k8)      | calico         |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      |
-|               |                    | kubernetes (k8)      | flannel        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      |
+|               |                    |                      | flannel        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      |
 |               | amazon linux 2 ami | swarm                | default        |  ![#f03c15](https://placehold.it/15/c5f015/000000?text=+)      |
 |               |                    | kubernetes (k8)      | calico         |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      |
-|               |                    | kubernetes (k8)      | flannel        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      |
+|               |                    |                      | flannel        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      |
 
 
-# Duration to create an infra ready to use
+# Average duration to create an infra ready to use
 | vm provider   | operating system   | cluster solution     | network type   | 1 m + 1 w  | 1 m + 2 w   | 2 m + 2 w  |
 | ------------- | ------------------ | -------------------- | -------------- | ---------- | ----------- | ---------- |
-| virtualbox    | centos 7           | swarm                | default        |            |             |            |
+| virtualbox    | centos 7           | swarm                | overlay        |            |             |            |
 |               | centos 7           | kubernetes (k8)      | calico         |            |             |            |
-|               | centos 7           | kubernetes (k8)      | flannel        |            |             |            |
-| aws           | centos 7 ami       | swarm                | default        | 12 mn 30 s |             |            |
+|               | centos 7           |                      | flannel        |            |             |            |
+| aws           | centos 7 ami       | swarm                | overlay        | g=19mn t1=6mn t2=11mn t3=2mn |             |            |
 |               |                    | kubernetes (k8)      | calico         |            |             |            |
-|               |                    | kubernetes (k8)      | flannel        |            |             |            |
-|               | amazon linux 2 ami | swarm                | default        | 22 mn 30 s |             |            |
+|               |                    |                      | flannel        |            |             |            |
+|               | amazon linux 2 ami | swarm                | overlay        | g=20mn t1=6mn t2=12mn t3=2mn |             |            |
 |               |                    | kubernetes (k8)      | calico         |            |             |            |
-|               |                    | kubernetes (k8)      | flannel        |            |             |            |
+|               |                    |                      | flannel        |            |             |            |
 
-m = master, w = worker
-Note : Duration are longer for amzn2 than for centos due to the compilation time rom source of glusterfs
+m = master, w = worker, g = general duration, t1 = vm creation duration, t2 = vm installation (docker, gluster, firewall) duration, t3 = cluster (swarm or k8) creation duration
+
+Note1 : On amzn2 ami, glusterfs and its dependencies are build from source
+
+Note2: around 3mn to delete 2 vm on aws
 
 # Operating system used on vm
 | vm provider | operating system               | user           | pwd                  |
 | ----------- | ------------------------------ | -------------- | -------------------- |
 | virtualbox  | centos 7                       | ansible        | centos               |
 | aws         | centos 7 ami   (free tier)     | ansible        | N/A ssh key used     |
-| aws         | amazon linux 2 (free tier)     | ec2-user       | N/A ssh key used     |
+|             | amazon linux 2 (free tier)     | ec2-user       | N/A ssh key used     |
 
 
 # Micro services file system

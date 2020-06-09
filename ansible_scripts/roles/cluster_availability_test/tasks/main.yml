@@ -1,0 +1,14 @@
+---
+- name: Touch a test file on the master[0] glusterfs shared directoty
+  become: true
+  file:
+    path: /private/mnt/test.txt
+    state: present
+  tags: [cluster,master]
+
+- name: Check if test file on the worker[0] glusterfs shared directoty exists
+  stat:
+    path: /private/mnt/test.txt
+  register: stat_result
+  failed_when: not stat_result.stat.exists
+  tags: [cluster,worker]

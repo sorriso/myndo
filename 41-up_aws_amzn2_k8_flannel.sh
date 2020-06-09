@@ -20,20 +20,20 @@ end_3=`date +%s`
 end_g=`date +%s`
 
 runtime_g=$((end_g-start_g))
-runtimeh_g=$((runtime/60))
-runtimes_g=$((runtime-runtimeh*60))
+runtimeh_g=$((runtime_g/60))
+runtimes_g=$((runtime_g-runtimeh_g*60))
 
-runtime_1=$((end_g-start_g))
-runtimeh_1=$((runtime/60))
-runtimes_1=$((runtime-runtimeh*60))
+runtime_1=$((end_1-start_1))
+runtimeh_1=$((runtime_1/60))
+runtimes_1=$((runtime_1-runtimeh_1*60))
 
-runtime_2=$((end_g-start_g))
-runtimeh_2=$((runtime/60))
-runtimes_2=$((runtime-runtimeh*60))
+runtime_2=$((end_2-start_2))
+runtimeh_2=$((runtime_2/60))
+runtimes_2=$((runtime_2-runtimeh_2*60))
 
-runtime_3=$((end_g-start_g))
-runtimeh_3=$((runtime/60))
-runtimes_3=$((runtime-runtimeh*60))
+runtime_3=$((end_3-start_3))
+runtimeh_3=$((runtime_3/60))
+runtimes_3=$((runtime_3-runtimeh_3*60))
 
 echo "total runtime was : $runtimeh_g minutes $runtimes_g seconds"
 echo "   VM creation         runtime was : $runtimeh_1 minutes $runtimes_1 seconds"

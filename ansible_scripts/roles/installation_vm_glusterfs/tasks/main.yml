@@ -178,7 +178,7 @@
 - name: download gluster source  (amzn2)
   become: true
   get_url:
-    url: https://github.com/gluster/glusterfs/archive/v7.6.tar.gz
+    url: "https://github.com/gluster/glusterfs/archive/v{{ glusterfs_version_source_amzn2 }}.tar.gz"
     dest: /tmp/gluster/glusterfs.tar.gz
   tags: [aws,amzn2]
 # sudo curl -L https://github.com/gluster/glusterfs/archive/v7.6.tar.gz -o /tmp/gluster/glusterfs.tar.gz
@@ -208,28 +208,28 @@
   become: true
   command: ./autogen.sh
   args:
-    chdir: "/tmp/gluster/glusterfs-7.6"
-    creates: "/tmp/gluster/glusterfs-7.6/configure"
+    chdir: "/tmp/gluster/glusterfs-{{ glusterfs_version_source_amzn2 }}"
+    creates: "/tmp/gluster/glusterfs-{{ glusterfs_version_source_amzn2 }}/configure"
   tags: [aws,amzn2]
 # sudo ./autogen.sh
 
 - name: configure compilation of gluster
   become: yes
-  command: ./configure --prefix=/usr --libdir=/usr/lib64  chdir="/tmp/gluster/glusterfs-7.6"
+  command: ./configure --prefix=/usr --libdir=/usr/lib64  chdir="/tmp/gluster/glusterfs-{{ glusterfs_version_source_amzn2 }}"
   tags: [aws,amzn2]
 # sudo ./configure --prefix=/usr --libdir=/usr/lib64
 
 - name: Make compilation of gluster
   become: yes
   make:
-    chdir: /tmp/gluster/glusterfs-7.6
+    chdir: "/tmp/gluster/glusterfs-{{ glusterfs_version_source_amzn2 }}"
   tags: [aws,amzn2]
 # sudo make
 
 - name: install compilation of gluster
   become: yes
   make:
-    chdir: /tmp/gluster/glusterfs-7.6
+    chdir: "/tmp/gluster/glusterfs-{{ glusterfs_version_source_amzn2 }}"
     target: install
   tags: [aws,amzn2]
 # sudo make install
