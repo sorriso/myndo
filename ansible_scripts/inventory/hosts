@@ -1,4 +1,8 @@
 # Hosts
+g-master-A-1591710596 ansible_host=ec2-15-188-87-18.eu-west-3.compute.amazonaws.com
+g-worker-A-1591710824 ansible_host=ec2-15-188-195-57.eu-west-3.compute.amazonaws.com
+master-A-1591710596 ansible_host=ec2-15-188-87-18.eu-west-3.compute.amazonaws.com
+worker-A-1591710824 ansible_host=ec2-15-188-195-57.eu-west-3.compute.amazonaws.com
 localhost ansible_host=local
 
 [cluster_all:children]
@@ -7,17 +11,21 @@ cluster_workers
 
 [cluster_all:vars]
 # config
-ansible_ssh_user=centos
+ansible_ssh_user=ec2-user
 ansible_ssh_private_key_file=/Users/olivier/Documents/GitHub/myndo/ansible_scripts/vars/sandbox_key.pem
 
 
 [cluster_managers]
 # master
+master-A-1591710596
 
 
 [cluster_workers]
 # worker
+worker-A-1591710824
 
 
 [gluster]
 # gluster
+g-master-A-1591710596
+g-worker-A-1591710824

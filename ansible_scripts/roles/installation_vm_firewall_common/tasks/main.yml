@@ -4,11 +4,20 @@
 
 - name: Add firewall rules for glusterfs = Gluster Daemon
   become: true
-  command: firewall-cmd --permanent --add-service=ssh
+  firewalld:
+    service: ssh
+    permanent: yes
+    immediate: yes
+    state: enabled
   tags: [common]
-
+# sudo firewall-cmd --permanent --add-service=ssh
 
 - name: Remove firewall rules for cockpit
   become: true
-  command: firewall-cmd --remove-service=cockpit --permanent
+  firewalld:
+    service: cockpit
+    permanent: yes
+    immediate: yes
+    state: disabled
   tags: [common]
+# firewall-cmd --remove-service=cockpit --permanent

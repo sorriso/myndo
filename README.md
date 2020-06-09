@@ -27,7 +27,7 @@ This solution is based on opens source and/of aws free-tier solution:
 | aws           | centos 7 ami       | swarm                | default        |  ![#c5f015](https://placehold.it/15/c5f015/000000?text=+)      | ok         | ok          | ok             |
 | aws           | centos 7 ami       | kubernetes (k8)      | calico         |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      | ok         | ok          | nok            |
 | aws           | centos 7 ami       | kubernetes (k8)      | flannel        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      | ok         | ok          | nok            |
-| aws           | amazon linux 2 ami | swarm                | default        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      | nok        | nok         | nok            |
+| aws           | amazon linux 2 ami | swarm                | default        |  ![#f03c15](https://placehold.it/15/c5f015/000000?text=+)      | nok        | nok         | nok            |
 | aws           | amazon linux 2 ami | kubernetes (k8)      | calico         |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      | nok        | nok         | nok            |
 | aws           | amazon linux 2 ami | kubernetes (k8)      | flannel        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      | nok        | nok         | nok            |
 

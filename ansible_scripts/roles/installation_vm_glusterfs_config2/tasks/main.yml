@@ -1,8 +1,13 @@
 ---
 - name: Create glusterfs mount volume
   become: true
-  command: mkdir -p /private/mnt
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - '/private/mnt'
   tags: [common]
+# sudo mkdir -p /private/mnt
 
 - name: Make mount persistant on VM for gluster volume 1
   become: true
@@ -16,5 +21,8 @@
 
 - name: Make mount persistant on VM for gluster volume 4
   become: true
-  command: chown -R root:docker /private/mnt
+  file:
+    path: /private/mnt
+    owner: root
+    group: docker
   tags: [common]

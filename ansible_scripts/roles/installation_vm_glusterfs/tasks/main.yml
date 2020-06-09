@@ -56,18 +56,19 @@
 
 - name: Add Glusterfs repository (amzn2)
   become: true
-  command: yum install -y centos-release-gluster
+  yum:
+    name: 'centos-release-gluster'
+    state: present
   tags: [centos]
+# sudo yum install -y centos-release-gluster
 
 - name: Install xfsprogs (amzn2)
   become: true
-  command: yum install -y xfsprogs
+  yum:
+    name: 'xfsprogs'
+    state: present
   tags: [amzn2]
-
-- name: Add Glusterfs repository (amzn2)
-  become: true
-  command: yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-  tags: [amzn2]
+# sudo yum install -y xfsprogs
 
 - name: Install glusterfs package (centos)
   become: true
@@ -86,14 +87,170 @@
     state: present
   tags: [centos]
 
-- name: Install glusterfs (amzn2)
+# **************************************************
+# start compile gluster on amzn2
+# **************************************************
+
+- name: Install compilation tools for requiered glusterfs (amzn2)
   become: true
   yum:
     name:
-      - glusterfs-{{ glusterfs_version_amzn2 }}
-      - glusterfs-fuse-{{ glusterfs_version_amzn2 }}
+      - autoconf
+      - automake
+      - bison
+      - bzip2
+      - flex
+      - fuse-devel
+      - gcc
+      - git
+      - glib2-devel
+      - libacl-devel
+      - libaio-devel
+      - openssl-devel
+      - libibverbs-devel
+      - librdmacm-devel
+      - libtool
+      - libxml2-devel
+      - libuuid-devel
+      - lvm2
+      - make
+      - pkgconfig
+      - python
+      - python3
+      - readline-devel
+      - wget
+      - zlib-devel
     state: present
-  tags: [amzn2]
+  tags: [aws,amzn2]
+# sudo yum install -y  autoconf automake bison bzip2 flex fuse-devel gcc git glib2-devel libacl-devel libaio-devel openssl-devel libibverbs-devel librdmacm-devel libtool libxml2-devel libuuid-devel lvm2 make pkgconfig python python3 readline-devel wget zlib-devel
+
+- name: Create source directory for compilation
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - '/tmp/userspace'
+    - '/tmp/gluster'
+  tags: [aws,amzn2]
+# sudo mkdir -p /tmp/userspace
+# sudo mkdir -p /tmp/gluster
+
+# compile dependencies
+
+- name: download userspace-rcu source  (amzn2)
+  become: true
+  get_url:
+    url: https://lttng.org/files/urcu/userspace-rcu-0.10.2.tar.bz2
+    dest: /tmp/userspace/rcu.tar.gz
+  tags: [aws,amzn2]
+# sudo curl -L https://lttng.org/files/urcu/userspace-rcu-0.10.2.tar.bz2 -o /tmp/userspace/rcu.tar.gz
+
+- name: untar userspace-rcu directory (amzn2)
+  become: true
+  unarchive:
+    src: /tmp/userspace/rcu.tar.gz
+    dest: /tmp/userspace/
+    remote_src: yes
+  tags: [aws,amzn2]
+# sudo tar xvjf /tmp/userspace/rcu.tar.gz -C /tmp/userspace/
+
+- name: configure compilation of userspace-rcu
+  become: yes
+  command: ./configure --prefix=/usr --libdir=/usr/lib64  chdir="/tmp/userspace/userspace-rcu-0.10.2"
+  tags: [aws,amzn2]
+# cd /tmp/userspace/userspace-rcu-0.10.2
+# sudo ./configure --prefix=/usr --libdir=/usr/lib64
+
+- name: Make compilation of userspace-rcu
+  become: yes
+  command: make chdir="/tmp/userspace/userspace-rcu-0.10.2"
+  tags: [aws,amzn2]
+# sudo make
+
+- name: install compilation of userspace-rcu
+  become: yes
+  command: make install chdir="/tmp/userspace/userspace-rcu-0.10.2"
+  tags: [aws,amzn2]
+# sudo make install
+
+# compile gluster
+
+- name: download gluster source  (amzn2)
+  become: true
+  get_url:
+    url: https://github.com/gluster/glusterfs/archive/v7.6.tar.gz
+    dest: /tmp/gluster/glusterfs.tar.gz
+  tags: [aws,amzn2]
+# sudo curl -L https://github.com/gluster/glusterfs/archive/v7.6.tar.gz -o /tmp/gluster/glusterfs.tar.gz
+
+- name: untar gluster archive (amzn2)
+  become: true
+  unarchive:
+    src: /tmp/gluster/glusterfs.tar.gz
+    dest: /tmp/gluster/
+    remote_src: yes
+  tags: [aws,amzn2]
+# sudo tar xvzf /tmp/gluster/glusterfs.tar.gz -C /tmp/gluster/
+
+- name: correct right on gluster source directory (amzn2)
+  become: true
+  file:
+    path: /tmp/gluster
+    state: directory
+    recurse: yes
+    owner: ec2-user
+    group: wheel
+  tags: [aws,amzn2]
+# cd /tmp/gluster/glusterfs-7.6/
+# sudo chown -R ec2-user:wheel  /tmp/gluster
+
+- name: create make for gluster source directory (amzn2)
+  become: true
+  command: ./autogen.sh
+  args:
+    chdir: "/tmp/gluster/glusterfs-7.6"
+    creates: "/tmp/gluster/glusterfs-7.6/configure"
+  tags: [aws,amzn2]
+# sudo ./autogen.sh
+
+- name: configure compilation of gluster
+  become: yes
+  command: ./configure --prefix=/usr --libdir=/usr/lib64  chdir="/tmp/gluster/glusterfs-7.6"
+  tags: [aws,amzn2]
+# sudo ./configure --prefix=/usr --libdir=/usr/lib64
+
+- name: Make compilation of gluster
+  become: yes
+  make:
+    chdir: /tmp/gluster/glusterfs-7.6
+  tags: [aws,amzn2]
+# sudo make
+
+- name: install compilation of gluster
+  become: yes
+  make:
+    chdir: /tmp/gluster/glusterfs-7.6
+    target: install
+  tags: [aws,amzn2]
+# sudo make install
+
+
+- name: Remove source directory for compilation
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - '/tmp/userspace'
+    - '/tmp/gluster'
+  tags: [aws,amzn2]
+# sudo rm -Rf /tmp/userspace
+# sudo rm -Rf /tmp/gluster
+
+# **************************************************
+# end compile gluster on amzn2
+# **************************************************
+
 
 - name: enable sysv glusterfs service
   become: true
@@ -101,6 +258,22 @@
       name: glusterd.service
       enabled: yes
   tags: [common]
+# sudo systemctl enable glusterd
+
+- name: remove prefix variable sysv glusterfs service
+  become: true
+  replace:
+    path: /usr/lib/systemd/system/glusterd.service
+    regexp: '${prefix}'
+    replace: ''
+  tags: [aws,amzn2]
+
+- name: Reload systemd config
+  become: true
+  systemd:
+    daemon_reload: yes
+  tags: [common]
+# sudo systemctl daemon-reload
 
 - name: Start glusterfs service
   become: true
@@ -108,12 +281,14 @@
       name: glusterd.service
       state: started
   tags: [common]
+# sudo systemctl start glusterd
 
 - name: Get glusterfs service status
   become: true
   command: systemctl status glusterd
   register: gluster_status
   tags: [common]
+# sudo systemctl status glusterd
 
 - name: Display glusterfs service status
   debug:

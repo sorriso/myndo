@@ -1,1 +1,16 @@
 ---
+- name:  test
+  hosts: cluster_managers
+  gather_facts: true
+  pre_tasks:
+    - name: include VM env vars
+      include_vars: "./vars/vm_config.yml"
+    - name: include aws env vars
+      include_vars: "./vars/vm_config.{{ vm_env }}.yml"
+    - name: include vault for aws env
+      include_vars: "./vars/credentials.{{ vm_env }}.vault.yml"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  roles:
+    - test
+  tags: [aws,amzn2]

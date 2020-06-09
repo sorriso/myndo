@@ -3,18 +3,23 @@
 
 - name: Add firewall rules for K8
   become: true
-  command: firewall-cmd --add-port=10251/tcp --permanent
+  firewalld:
+    port: 10251/tcp
+    permanent: yes
+    immediate: yes
+    state: enabled
   tags: [k8]
+# sudo firewall-cmd --add-port=10251/tcp --permanent
 
 - name: Add firewall rules for K8
   become: true
-  command: firewall-cmd --add-port=10255/tcp --permanent
+  firewalld:
+    port: 10255/tcp
+    permanent: yes
+    immediate: yes
+    state: enabled
   tags: [k8]
-
-- name: Reload firewall
-  become: true
-  command: firewall-cmd --reload
-  tags: [k8]
+# sudo firewall-cmd --add-port=10255/tcp --permanent
 
 - name: Configure firewall routing rules
   become: true
@@ -23,8 +28,6 @@
               net.bridge.bridge-nf-call-ip6tables = 1
               net.bridge.bridge-nf-call-iptables = 1
     dest: /etc/sysctl.d/k8s.conf
-  tags: [common]
-
   tags: [k8]
 
 - name: Reload firewall general settings

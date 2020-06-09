@@ -23,30 +23,52 @@
 
 - name: Add firewall rules for glusterfs = Gluster Daemon
   become: true
-  command: firewall-cmd --add-port=24007/tcp --permanent
+  firewalld:
+    port: 24007/tcp
+    permanent: yes
+    immediate: yes
+    state: enabled
   tags: [common]
+# sudo firewall-cmd --add-port=24007/tcp --permanent
 
 - name: Add firewall rules for glusterfs = Each brick for every volume on your host requires it’s own port
   become: true
-  command: firewall-cmd --add-port=49152-49156/tcp --permanent
+  firewalld:
+    port: 49152-49156/tcp
+    permanent: yes
+    immediate: yes
+    state: enabled
   tags: [common]
+# sudo firewall-cmd --add-port=49152-49156/tcp --permanent
 
 - name: Add firewall rules for glusterfs = For rpc port mapper
   become: true
-  command: firewall-cmd --add-port=111/tcp --permanent
+  firewalld:
+    port: 111/tcp
+    permanent: yes
+    immediate: yes
+    state: enabled
   tags: [common]
+# sudo firewall-cmd --add-port=111/tcp --permanent
 
 - name: Add firewall rules for glusterfs = port mapper udp
   become: true
-  command: firewall-cmd --add-port=111/udp --permanent
+  firewalld:
+    port: 111/udp
+    permanent: yes
+    immediate: yes
+    state: enabled
   tags: [common]
+# sudo firewall-cmd --add-port=111/udp --permanent
 
 - name: Add firewall rules for glusterfs = port mapper udp
   become: true
-  command: firewall-cmd --add-port=2049/tcp --permanent
+  firewalld:
+    port: 2049/tcp
+    permanent: yes
+    immediate: yes
+    state: enabled
   tags: [common]
+# sudo firewall-cmd --add-port=2049/tcp --permanent
 
-- name: Reload firewall
-  become: true
-  command: firewall-cmd --reload
-  tags: [common]
+# sudo firewall-cmd --reload / replaced by 'immediate: yes'

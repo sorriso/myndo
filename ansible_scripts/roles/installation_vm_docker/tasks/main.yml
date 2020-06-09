@@ -33,7 +33,9 @@
 
 - name: Add Docker repository (centos)
   become: true
-  command: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  yum_repository:
+    name: docker-ce
+    baseurl: https://download.docker.com/linux/centos/docker-ce.repo
   tags: [centos]
 
 - name: Install Docker (centos)
@@ -59,27 +61,13 @@
     state: present
   tags: [common]
 
-- name: Get last version number of Docker-compose
-  command: "curl -s https://api.github.com/repos/docker/compose/releases/latest"
-  register: curl_results
-  tags: [common]
-
-- name: Print last version number of Docker-compose
-  set_fact:
-    COMPOSE_VERSION: "{{ curl_results.stdout | regex_search(regexp,'\\1') | first }}"
-  vars:
-    regexp: '.*tag_name.*:\s\"(.*)\",.*'
-  tags: [common]
-
-- name: Print last version number of Docker-compose
-  debug:
-    var: COMPOSE_VERSION
-  tags: [common]
-
-- name: Rmemove old Docker-compose version file
+- name: Remove old Docker-compose version file
   become: true
-  command: rm -f /usr/local/bin/docker-compose
+  file:
+    path: /usr/local/bin/docker-compose
+    state: absent
   tags: [common]
+# rm -f /usr/local/bin/docker-compose
 
 - name: Get last Docker-compose version file
   become: true
@@ -90,13 +78,19 @@
 
 - name: Make last Docker-compose version executable
   become: true
-  shell: chmod +x /usr/local/bin/docker-compose
+  file:
+    path: /usr/local/bin/docker-compose
+    mode: a+x
   tags: [common]
+# sudo chmod +x /usr/local/bin/docker-compose
 
-- name: Make last Docker-compose version executable
+- name: creates /etc/docker directory for configuration
   become: true
-  command: mkdir -p /etc/docker
+  file:
+    path: /etc/docker
+    state: directory
   tags: [common]
+# mkdir -p /etc/docker
 
 - name: Set up the Docker daemon config - native.cgroupdriver systemd
   become: true
@@ -113,10 +107,12 @@
     dest: /etc/docker/daemon.json
   tags: [common]
 
-- name: Reload system daemon
+- name: Reload systemd config
   become: true
-  command: systemctl daemon-reload
+  systemd:
+    daemon_reload: yes
   tags: [common]
+# sudo systemctl daemon-reload
 
 - name: enable sysv dockerd service
   become: true

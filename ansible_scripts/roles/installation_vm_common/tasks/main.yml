@@ -11,26 +11,19 @@
     update_cache: yes
   tags: [common]
 
+- name: Install firewalld service
+  become: true
+  yum:
+    name: 'firewalld'
+    state: present
+  tags: [common]
+
 - name: upgrade all packages (centos)
   become: true
   yum:
     name: '*'
     state: latest
-    exclude: docker*,containerd.io* #issue on latest version, nobest installation
-  tags: [centos]
-
-- name: upgrade all packages (amzn2)
-  become: true
-  yum:
-    name: '*'
-    state: latest
-  tags: [amzn2]
-
-- name: install required ansible packages :firewalld
-  become: true
-  yum:
-    name: firewalld
-    state: present
+    exclude: docker*,containerd.io*,glusterd*,kubelet*,kubeadm*,kubectl*
   tags: [common]
 
 - name: enable sysv firewalld service
@@ -56,20 +49,15 @@
 
 - name: install required packages for ansible boto3 for python 3
   become: true
-  shell: pip3 install boto3
+  pip:
+    name: boto3
+    executable: pip3
   tags: [common]
 
-- name: add epel-release packages (centos)
+- name: add epel-release packages
   become: true
-  yum:
-    name: 'epel-release'
-    state: present
-  tags: [centos]
-
-- name: add epel-release packages (amzn2)
-  become: true
-  command: yum-config-manager --enable epel
-  tags: [amzn2]
+  command: yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+  tags: [common]
 
 - name: install pip packages for pyhton 2.7
   become: true
@@ -80,7 +68,8 @@
 
 - name: install required packages for ansible boto3 for python 2
   become: true
-  shell: pip install boto3
+  pip:
+    name: boto3
   tags: [common]
 
 - name: install required packages for installation = dnf
