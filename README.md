@@ -1,5 +1,6 @@
 # this is an proof of concept tool, backup your all data before using it, I will be responsible of any issue due to its use.
 
+
 # Purpose
 A tool (for unix environment) aiming to:
 * automate cluster installation hosting micro service (i.e. containers)
@@ -18,7 +19,7 @@ This solution is based on opens source and/of aws free-tier solution:
  * aws free-tier for cloud vm hosting (centos 7 & amazon linux 2)
 
 
-# summary
+# Status summary
 | vm provider   | operating system   | cluster solution     | network type   | available  | create vm  | install vm  | create cluster |
 | ------------- | ------------------ | -------------------- | -------------- | ---------- | ---------- | ----------- | -------------- |
 | virtualbox    | centos 7           | swarm                | default        |  ![#f03c15](https://placehold.it/15/c5f015/000000?text=+)      | ok         | ok          | ok             |
@@ -27,17 +28,32 @@ This solution is based on opens source and/of aws free-tier solution:
 | aws           | centos 7 ami       | swarm                | default        |  ![#c5f015](https://placehold.it/15/c5f015/000000?text=+)      | ok         | ok          | ok             |
 | aws           | centos 7 ami       | kubernetes (k8)      | calico         |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      | ok         | ok          | nok            |
 | aws           | centos 7 ami       | kubernetes (k8)      | flannel        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      | ok         | ok          | nok            |
-| aws           | amazon linux 2 ami | swarm                | default        |  ![#f03c15](https://placehold.it/15/c5f015/000000?text=+)      | nok        | nok         | nok            |
+| aws           | amazon linux 2 ami | swarm                | default        |  ![#f03c15](https://placehold.it/15/c5f015/000000?text=+)      | ok         | ok          | ok             |
 | aws           | amazon linux 2 ami | kubernetes (k8)      | calico         |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      | nok        | nok         | nok            |
 | aws           | amazon linux 2 ami | kubernetes (k8)      | flannel        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      | nok        | nok         | nok            |
 
 
+# Duration to create an infra ready to use
+| vm provider   | operating system   | cluster solution     | network type   | 1 m + 1 w  | 1 m + 2 w   | 2 m + 2 w  |
+| ------------- | ------------------ | -------------------- | -------------- | ---------- | ----------- | ---------- |
+| virtualbox    | centos 7           | swarm                | default        |            |             |            |
+| virtualbox    | centos 7           | kubernetes (k8)      | calico         |            |             |            |
+| virtualbox    | centos 7           | kubernetes (k8)      | flannel        |            |             |            |
+| aws           | centos 7 ami       | swarm                | default        | 22 mn 30 s |             |            |
+| aws           | centos 7 ami       | kubernetes (k8)      | calico         |            |             |            |
+| aws           | centos 7 ami       | kubernetes (k8)      | flannel        |            |             |            |
+| aws           | amazon linux 2 ami | swarm                | default        | 22 mn 30 s |             |            |
+| aws           | amazon linux 2 ami | kubernetes (k8)      | calico         |            |             |            |
+| aws           | amazon linux 2 ami | kubernetes (k8)      | flannel        |            |             |            |
+m = master
+w = worker
+
 # Operating system used on vm
-| vm provider | operating system                                        | user           | pwd                                                        |
-| ----------- | ------------------------------------------------------- | -------------- | ---------------------------------------------------------- |
-| virtualbox  | centos 7 (tested with CentOS-7-x86_64-Minimal-2003.iso and VBoxGuestAdditions_6.1.8.iso) | ansible        | centos                                                     |
-| aws         | centos 7 ami   (free tier)                              | ansible        | N/A ssh key used                                           |
-| aws         | amazon linux 2 (free tier)                              | ec2-user       | N/A ssh key used                                           |
+| vm provider | operating system               | user           | pwd                  |
+| ----------- | ------------------------------ | -------------- | -------------------- |
+| virtualbox  | centos 7                       | ansible        | centos               |
+| aws         | centos 7 ami   (free tier)     | ansible        | N/A ssh key used     |
+| aws         | amazon linux 2 (free tier)     | ec2-user       | N/A ssh key used     |
 
 
 # Micro services file system
@@ -46,6 +62,7 @@ the minimum size of the cluster is 1 master and 2 workers (default configuration
 
 
 # Prerequisites on local host
+(tested with CentOS-7-x86_64-Minimal-2003.iso and VBoxGuestAdditions_6.1.8.iso)
 - docker installed & running (tested with v19.03.8)
 - virtualbox installed (tested with 6.1.8 r137981 (Qt5.6.3))
 - ansible installed (tested with v2.9.9)
@@ -109,6 +126,8 @@ the minimum size of the cluster is 1 master and 2 workers (default configuration
   - generate an ssh key & name it as "sandbox_key.pem"
   - download it
   - move it in <myndo_root>/ansible_scripts/vars/sandbox_key.pem
+
+
 # create an ansible vault to store aws credentials:
   - cd <myndo_root>/ansible_scripts/vars
   - openssl genrsa -out ./vault.aws_sandbox.pass 2048
@@ -118,6 +137,7 @@ the minimum size of the cluster is 1 master and 2 workers (default configuration
     - aws_access_key: XXXXXXXXXXXXX
     - aws_secret_key: YYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
   - duplicate this file as "credentials.aws_sandbox_amzn2.vault.yml"
+
 
 # Accessing to vm via ssh
 * virtualbox
@@ -130,6 +150,7 @@ the minimum size of the cluster is 1 master and 2 workers (default configuration
      - ssh centos@<vm dns name> -i  <myndo_root>/ansible_scripts/vars/sandbox_key.pem
    - amazon linux 2:
      - ssh ec2-user@<vm dns name> -i  <myndo_root>/ansible_scripts/vars/sandbox_key.pem
+
 
 # Using micro services through the created cluster
 * swarm
