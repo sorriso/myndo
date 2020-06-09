@@ -20,33 +20,36 @@ This solution is based on opens source and/of aws free-tier solution:
 
 
 # Status summary
-| vm provider   | operating system   | cluster solution     | network type   | available  | create vm  | install vm  | create cluster |
-| ------------- | ------------------ | -------------------- | -------------- | ---------- | ---------- | ----------- | -------------- |
-| virtualbox    | centos 7           | swarm                | default        |  ![#f03c15](https://placehold.it/15/c5f015/000000?text=+)      | ok         | ok          | ok             |
-| virtualbox    | centos 7           | kubernetes (k8)      | calico         |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      | ok         | ok          | nok            |
-| virtualbox    | centos 7           | kubernetes (k8)      | flannel        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      | ok         | ok          | nok            |
-| aws           | centos 7 ami       | swarm                | default        |  ![#c5f015](https://placehold.it/15/c5f015/000000?text=+)      | ok         | ok          | ok             |
-| aws           | centos 7 ami       | kubernetes (k8)      | calico         |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      | ok         | ok          | nok            |
-| aws           | centos 7 ami       | kubernetes (k8)      | flannel        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      | ok         | ok          | nok            |
-| aws           | amazon linux 2 ami | swarm                | default        |  ![#f03c15](https://placehold.it/15/c5f015/000000?text=+)      | ok         | ok          | ok             |
-| aws           | amazon linux 2 ami | kubernetes (k8)      | calico         |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      | nok        | nok         | nok            |
-| aws           | amazon linux 2 ami | kubernetes (k8)      | flannel        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      | nok        | nok         | nok            |
+| vm provider   | operating system   | cluster solution     | network type   | available  |
+| ------------- | ------------------ | -------------------- | -------------- | ---------- |
+| virtualbox    | centos 7           | swarm                | default        |  ![#f03c15](https://placehold.it/15/c5f015/000000?text=+)      |
+|               |                    | kubernetes (k8)      | calico         |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      |
+|               |                    | kubernetes (k8)      | flannel        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      |
+
+| aws           | centos 7 ami       | swarm                | default        |  ![#c5f015](https://placehold.it/15/c5f015/000000?text=+)      |
+|               |                    | kubernetes (k8)      | calico         |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      |
+|               |                    | kubernetes (k8)      | flannel        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      |
+|               | amazon linux 2 ami | swarm                | default        |  ![#f03c15](https://placehold.it/15/c5f015/000000?text=+)      |
+|               |                    | kubernetes (k8)      | calico         |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      |
+|               |                    | kubernetes (k8)      | flannel        |  ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)      |
 
 
 # Duration to create an infra ready to use
 | vm provider   | operating system   | cluster solution     | network type   | 1 m + 1 w  | 1 m + 2 w   | 2 m + 2 w  |
 | ------------- | ------------------ | -------------------- | -------------- | ---------- | ----------- | ---------- |
 | virtualbox    | centos 7           | swarm                | default        |            |             |            |
-| virtualbox    | centos 7           | kubernetes (k8)      | calico         |            |             |            |
-| virtualbox    | centos 7           | kubernetes (k8)      | flannel        |            |             |            |
-| aws           | centos 7 ami       | swarm                | default        | 22 mn 30 s |             |            |
-| aws           | centos 7 ami       | kubernetes (k8)      | calico         |            |             |            |
-| aws           | centos 7 ami       | kubernetes (k8)      | flannel        |            |             |            |
-| aws           | amazon linux 2 ami | swarm                | default        | 22 mn 30 s |             |            |
-| aws           | amazon linux 2 ami | kubernetes (k8)      | calico         |            |             |            |
-| aws           | amazon linux 2 ami | kubernetes (k8)      | flannel        |            |             |            |
-m = master
-w = worker
+|               | centos 7           | kubernetes (k8)      | calico         |            |             |            |
+|               | centos 7           | kubernetes (k8)      | flannel        |            |             |            |
+
+| aws           | centos 7 ami       | swarm                | default        | 12 mn 30 s |             |            |
+|               |                    | kubernetes (k8)      | calico         |            |             |            |
+|               |                    | kubernetes (k8)      | flannel        |            |             |            |
+|               | amazon linux 2 ami | swarm                | default        | 22 mn 30 s |             |            |
+|               |                    | kubernetes (k8)      | calico         |            |             |            |
+|               |                    | kubernetes (k8)      | flannel        |            |             |            |
+
+m = master, w = worker
+Note : Duration are longer for amzn2 than for centos due to the compilation time rom source of glusterfs
 
 # Operating system used on vm
 | vm provider | operating system               | user           | pwd                  |

@@ -21,17 +21,17 @@
 
 - name: Link Glusterfs node partition (centos aws)
   become: true
-  command: parted /dev/xvdb mklabel msdos
+  command: parted /dev/xvdf mklabel msdos
   tags: [aws,centos]
 
 - name: Create Glusterfs node partition (centos aws)
   become: true
-  command: parted -a opt /dev/xvdb mkpart primary xfs 2048s 100%
+  command: parted -a opt /dev/xvdf mkpart primary xfs 2048s 100%
   tags: [aws,centos]
 
 - name: Format Glusterfs node partition (centos aws)
   become: true
-  command: mkfs.xfs -f /dev/xvdb -L gfsdisk
+  command: mkfs.xfs -f /dev/xvdf -L gfsdisk
   tags: [aws,centos]
 
 
@@ -84,17 +84,17 @@
 
 - name: Mount Glusterfs node partition (centos aws)
   become: true
-  command: mount /dev/xvdb /private/gfsbrick/
+  command: mount /dev/xvdf /private/gfsbrick/
   tags: [aws,centos]
 
 - name: Make permanent Glusterfs directory mounting (centos aws)
   become: true
-  command: sudo /bin/su -c "echo '/dev/xvdb /private/gfsbrick/ xfs defaults 1 2' >> /etc/fstab"
+  command: sudo /bin/su -c "echo '/dev/xvdf /private/gfsbrick/ xfs defaults 1 2' >> /etc/fstab"
   tags: [aws,centos]
 
 - name: Get glusterfs volume status (centos aws)
   become: true
-  command: df -hTP /dev/xvdb
+  command: df -hTP /dev/xvdf
   register: gluster_status2
   tags: [aws,centos]
 
